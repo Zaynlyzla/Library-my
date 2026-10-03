@@ -1,0 +1,3660 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>The Cozy Fairytale Library</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=DM+Sans:wght@400;500;600&display=swap');
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+    width:100%;
+    min-height:100%;
+}
+
+body{
+    background:#241710;
+    color:#f3e4ca;
+    font-family:'DM Sans',sans-serif;
+    overflow-x:hidden;
+    -webkit-tap-highlight-color:transparent;
+}
+
+button,
+.book,
+.shelf-row,
+#zoomOverlay{
+    -webkit-tap-highlight-color:transparent;
+    user-select:none;
+}
+
+button:focus,
+button:focus-visible,
+.book:focus,
+.book:focus-visible,
+.shelf-row:focus,
+.shelf-row:focus-visible{
+    outline:none !important;
+    box-shadow:none;
+}
+
+button{
+    appearance:none;
+    -webkit-appearance:none;
+}
+
+/* INTRO */
+
+#intro{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    text-align:center;
+
+    background:
+        radial-gradient(
+            circle at 50% 35%,
+            #704b32 0%,
+            #352016 45%,
+            #110905 100%
+        );
+
+    transition:
+        opacity .8s ease,
+        visibility .8s ease;
+}
+
+#intro.hide{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+}
+
+.intro-content{
+    width:min(720px,90%);
+}
+
+.intro-small{
+    font-size:10px;
+    letter-spacing:5px;
+    color:#c9ac7d;
+    margin-bottom:22px;
+}
+
+.intro-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(48px,10vw,90px);
+    line-height:.86;
+    font-weight:500;
+}
+
+.intro-subtitle{
+    margin:25px 0 35px;
+    font-family:'Cormorant Garamond',serif;
+    font-size:21px;
+    font-style:italic;
+    color:#cbb79b;
+}
+
+#enterButton{
+    position:relative;
+    z-index:100000;
+
+    padding:15px 32px;
+
+    border:1px solid #c5a06b;
+    background:transparent;
+
+    color:#e8d4ae;
+
+    font-size:10px;
+    letter-spacing:3px;
+
+    cursor:pointer;
+    touch-action:manipulation;
+
+    transition:.25s;
+}
+
+#enterButton:hover{
+    background:#c5a06b;
+    color:#21140d;
+}
+
+#enterButton:active{
+    transform:scale(.96);
+}
+
+/* LIBRARY */
+
+.library{
+    min-height:100vh;
+
+    background:
+        linear-gradient(
+            rgba(39,23,15,.3),
+            rgba(22,12,8,.88)
+        ),
+        radial-gradient(
+            circle at 50% 10%,
+            #68452d,
+            #24160e 72%
+        );
+}
+
+/* TOP */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:500;
+
+    height:78px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:0 5%;
+
+    background:rgba(25,14,9,.9);
+    border-bottom:1px solid rgba(201,166,107,.2);
+
+    backdrop-filter:blur(12px);
+}
+
+.logo{
+    font-family:'Cormorant Garamond',serif;
+    font-size:28px;
+}
+
+.logo small{
+    display:block;
+    margin-top:-2px;
+
+    font-family:'DM Sans',sans-serif;
+    font-size:8px;
+    letter-spacing:4px;
+
+    color:#bda276;
+}
+
+.top-buttons{
+    display:flex;
+    gap:8px;
+}
+
+.top-btn{
+    width:40px;
+    height:40px;
+
+    border:1px solid rgba(205,167,105,.3);
+
+    background:#2d1b12;
+    color:#d5b986;
+
+    cursor:pointer;
+    touch-action:manipulation;
+}
+
+/* HERO */
+
+.hero{
+    padding:60px 20px 28px;
+    text-align:center;
+}
+
+.hero-label{
+    font-size:9px;
+    letter-spacing:5px;
+    color:#c8a570;
+}
+
+.hero h1{
+    margin:7px 0;
+
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(42px,7vw,70px);
+    font-weight:500;
+}
+
+.hero p{
+    font-family:'Cormorant Garamond',serif;
+    font-size:19px;
+    font-style:italic;
+    color:#b9a48a;
+}
+
+/* SEARCH */
+
+.search-container{
+    width:min(520px,90%);
+    margin:0 auto 45px;
+}
+
+#search{
+    width:100%;
+    padding:14px 18px;
+
+    border:1px solid #68432c;
+    outline:none;
+
+    background:#21130d;
+    color:#ead9ba;
+}
+
+#search:focus{
+    outline:none;
+    border-color:#9a7448;
+}
+
+#search::placeholder{
+    color:#7e6852;
+}
+
+/* ROOM */
+
+.library-room{
+    width:min(1400px,96%);
+    margin:auto;
+    padding-bottom:70px;
+}
+
+.room-frame{
+    position:relative;
+    padding:0 4%;
+}
+
+.side-shelf{
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:85px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2b170e,
+            #71452b,
+            #321b10
+        );
+
+    border:5px solid #24140c;
+}
+
+.side-left{left:0}
+.side-right{right:0}
+
+/* SHELF */
+
+.shelf-row{
+    position:relative;
+    margin-bottom:34px;
+    cursor:pointer;
+    transition:
+        transform .45s ease,
+        opacity .5s ease;
+    touch-action:manipulation;
+}
+
+.shelf-row:hover{
+    transform:translateY(-4px);
+}
+
+.shelf-frame{
+    padding:24px 25px 35px;
+
+    background:
+        linear-gradient(
+            90deg,
+            #2b170e,
+            #70452c 8%,
+            #58351f 50%,
+            #70452c 92%,
+            #2b170e
+        );
+
+    border:8px solid #28160d;
+    border-bottom:14px solid #1d1009;
+
+    box-shadow:
+        inset 0 0 25px rgba(0,0,0,.55),
+        0 15px 30px rgba(0,0,0,.4);
+}
+
+.shelf-heading{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:20px;
+}
+
+.shelf-heading h2{
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px;
+    font-weight:500;
+    color:#dfc69a;
+}
+
+.open-label{
+    font-size:8px;
+    letter-spacing:2px;
+    color:#a88a61;
+    opacity:0;
+}
+
+.shelf-row:hover .open-label{
+    opacity:1;
+}
+
+/* BOOKS */
+
+.books-row{
+    height:185px;
+
+    display:flex;
+    align-items:flex-end;
+    gap:8px;
+
+    overflow:hidden;
+}
+
+.book{
+    flex:1;
+    min-width:0;
+    max-width:75px;
+    height:165px;
+
+    position:relative;
+
+    border-radius:2px 5px 4px 2px;
+
+    cursor:pointer;
+    overflow:hidden;
+
+    box-shadow:
+        inset -5px 0 7px rgba(0,0,0,.25),
+        4px 6px 8px rgba(0,0,0,.42);
+
+    transition:
+        transform .25s ease,
+        filter .25s ease;
+
+    touch-action:manipulation;
+}
+
+.book:hover{
+    transform:translateY(-14px) rotate(-1deg);
+    filter:brightness(1.15);
+    z-index:20;
+}
+
+.book:active{
+    filter:brightness(1.08);
+}
+
+.book::before{
+    content:"";
+
+    position:absolute;
+    left:5px;
+    top:7px;
+    bottom:7px;
+
+    width:2px;
+
+    background:rgba(255,255,255,.15);
+}
+
+.book::after{
+    content:"";
+
+    position:absolute;
+    inset:9px 6px;
+
+    border:1px solid rgba(245,220,180,.3);
+
+    pointer-events:none;
+}
+
+.book-title{
+    position:absolute;
+
+    top:13px;
+    bottom:13px;
+    left:50%;
+
+    transform:
+        translateX(-50%)
+        rotate(180deg);
+
+    writing-mode:vertical-rl;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    width:100%;
+    padding:0 8px;
+
+    text-align:center;
+
+    font-family:'Cormorant Garamond',serif;
+    font-size:13px;
+    line-height:1.05;
+
+    color:#f0dfbd;
+
+    text-shadow:1px 1px 2px rgba(0,0,0,.8);
+}
+
+.book-number{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:7px;
+
+    text-align:center;
+
+    font-size:7px;
+
+    color:rgba(245,220,180,.65);
+}
+
+.c1{background:#663c2a}
+.c2{background:#49372f}
+.c3{background:#75543b}
+.c4{background:#522d25}
+.c5{background:#806345}
+.c6{background:#4a2822}
+.c7{background:#68482d}
+.c8{background:#43332b}
+.c9{background:#754639}
+.c10{background:#5b402d}
+.c11{background:#6e4834}
+.c12{background:#472e25}
+.c13{background:#765436}
+.c14{background:#553b34}
+.c15{background:#693f2c}
+.c16{background:#49382e}
+.c17{background:#7b563b}
+.c18{background:#51342b}
+.c19{background:#6a4035}
+.c20{background:#44332a}
+.c21{background:#764a31}
+.c22{background:#51372b}
+.c23{background:#69432f}
+.c24{background:#47352d}
+.c25{background:#7b5b3d}
+.c26{background:#5d3c2f}
+.c27{background:#48352c}
+.c28{background:#704733}
+.c29{background:#58402f}
+.c30{background:#694a35}
+.c31{background:#493026}
+.c32{background:#75523a}
+.c33{background:#523a2f}
+.c34{background:#694234}
+.c35{background:#4a352a}
+.c36{background:#765239}
+.c37{background:#5b4031}
+
+/* ZOOM */
+
+#zoomOverlay{
+    position:fixed;
+    inset:0;
+    z-index:400;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(79,51,33,.75),
+            rgba(13,7,4,.98)
+        );
+
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+
+    transition:.5s;
+}
+
+#zoomOverlay.active{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+}
+
+body.zooming{
+    overflow:hidden;
+}
+
+.shelf-row.zoomed{
+    position:fixed;
+    z-index:450;
+
+    left:50%;
+    top:50%;
+
+    width:min(1300px,94vw);
+
+    margin:0;
+
+    transform:translate(-50%,-50%);
+
+    cursor:default;
+}
+
+.shelf-row.zoomed:hover{
+    transform:translate(-50%,-50%);
+}
+
+.library-room.zoom-active .shelf-row:not(.zoomed){
+    opacity:0;
+    pointer-events:none;
+    transform:scale(.8);
+}
+
+.shelf-row.zoomed .shelf-frame{
+    max-height:90vh;
+    overflow:auto;
+}
+
+.shelf-row.zoomed .books-row{
+    height:300px;
+    justify-content:center;
+    gap:12px;
+}
+
+.shelf-row.zoomed .book{
+    flex:none;
+    width:70px;
+    height:270px;
+    max-width:none;
+}
+
+.shelf-row.zoomed .book-title{
+    font-size:16px;
+}
+
+/* BACK */
+
+#backButton{
+    position:fixed;
+
+    top:95px;
+    left:25px;
+
+    z-index:600;
+
+    display:none;
+
+    padding:11px 17px;
+
+    border:1px solid #9a7448;
+
+    background:#2a1810;
+    color:#dfc49a;
+
+    font-size:10px;
+    letter-spacing:1px;
+
+    cursor:pointer;
+}
+
+#backButton.show{
+    display:block;
+}
+
+/* READER */
+
+#reader{
+    position:fixed;
+    inset:0;
+
+    z-index:900;
+
+    display:none;
+
+    align-items:center;
+    justify-content:center;
+
+    padding:20px;
+
+    background:rgba(12,7,4,.94);
+
+    backdrop-filter:blur(10px);
+}
+
+#reader.show{
+    display:flex;
+}
+
+.paper{
+    width:min(850px,100%);
+    max-height:90vh;
+
+    overflow-y:auto;
+
+    position:relative;
+
+    padding:55px clamp(25px,7vw,75px);
+
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            rgba(255,255,255,.35),
+            transparent 30%
+        ),
+        #f4e6ce;
+
+    color:#342116;
+
+    box-shadow:
+        0 30px 90px rgba(0,0,0,.7);
+}
+
+#closeReader{
+    position:absolute;
+    right:18px;
+    top:12px;
+
+    border:0;
+    background:none;
+
+    color:#60422e;
+    font-size:28px;
+
+    cursor:pointer;
+}
+
+.category{
+    text-align:center;
+
+    font-size:9px;
+    letter-spacing:4px;
+
+    color:#96734e;
+}
+
+#storyTitle{
+    margin:15px 0 8px;
+
+    text-align:center;
+
+    font-family:'Cormorant Garamond',serif;
+
+    font-size:clamp(40px,7vw,62px);
+    font-weight:500;
+
+    line-height:.95;
+}
+
+#storyOrigin{
+    margin-bottom:35px;
+
+    text-align:center;
+
+    font-family:'Cormorant Garamond',serif;
+    font-style:italic;
+
+    color:#917252;
+}
+
+#storyText{
+    font-family:'Cormorant Garamond',serif;
+    font-size:20px;
+    line-height:1.8;
+}
+
+#storyText p{
+    margin-bottom:21px;
+}
+
+#storyText .dialogue{
+    margin-left:18px;
+    padding-left:18px;
+    border-left:2px solid #8b5b38;
+    color:#4a2b1c;
+    font-style:italic;
+    font-weight:500;
+}
+
+#storyText .story-opening{
+    position:relative;
+}
+
+#storyText .drop-cap{
+    float:left;
+    display:inline-block;
+    font-family:'Cormorant Garamond', Georgia, serif;
+    font-size:3.55em;
+    line-height:.72;
+    font-weight:400;
+    font-style:italic;
+    color:#8b6042;
+    margin:7px 8px 0 0;
+    letter-spacing:-1px;
+    transform:translateY(1px);
+}
+
+#storyText .moral{
+    margin-top:42px;
+    padding:26px;
+
+    border-top:1px solid #b99a72;
+    border-bottom:1px solid #b99a72;
+
+    text-align:center;
+
+    font-style:italic;
+}
+
+#storyText .moral-title{
+    display:block;
+    margin-bottom:10px;
+
+    font-family:'DM Sans',sans-serif;
+
+    font-size:10px;
+    letter-spacing:3px;
+
+    color:#806143;
+    font-style:normal;
+}
+
+.reader-actions{
+    display:flex;
+    justify-content:center;
+    margin-top:30px;
+}
+
+#bookmarkBtn{
+    padding:10px 18px;
+
+    border:1px solid #9c7b59;
+
+    background:transparent;
+
+    color:#60432d;
+
+    cursor:pointer;
+}
+
+#bookmarkBtn.saved{
+    background:#60432d;
+    color:#f5e8d1;
+}
+
+/* EMPTY */
+
+#empty{
+    display:none;
+
+    padding:60px 20px;
+
+    text-align:center;
+
+    font-family:'Cormorant Garamond',serif;
+    font-size:21px;
+
+    color:#9d866d;
+}
+
+/* FOOTER */
+
+footer{
+    padding:30px;
+    text-align:center;
+    color:#735c48;
+    font-size:9px;
+    letter-spacing:3px;
+}
+
+
+/* =========================================================
+   MUSIC ROOM + FAVORITES
+========================================================= */
+
+.special-page{
+    position:fixed;
+    inset:0;
+    z-index:850;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:30px;
+    background:
+        radial-gradient(circle at 50% 20%,rgba(116,78,49,.88),rgba(17,9,5,.98) 72%);
+    backdrop-filter:blur(12px);
+}
+
+.special-page.show{display:flex;}
+
+.special-inner{
+    width:min(1050px,94vw);
+    max-height:90vh;
+    overflow:auto;
+    padding:35px;
+    border:1px solid rgba(205,167,105,.28);
+    background:rgba(31,18,11,.96);
+    box-shadow:0 30px 100px rgba(0,0,0,.65);
+}
+
+.special-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.special-kicker{
+    font-size:9px;
+    letter-spacing:4px;
+    color:#bda276;
+}
+
+.special-title{
+    margin-top:5px;
+    font-family:'Cormorant Garamond',serif;
+    font-size:clamp(38px,6vw,62px);
+    font-weight:500;
+}
+
+.special-close{
+    width:42px;
+    height:42px;
+    border:1px solid rgba(205,167,105,.35);
+    background:#2d1b12;
+    color:#d5b986;
+    font-size:24px;
+    cursor:pointer;
+}
+
+.music-stage{
+    min-height:480px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:24px;
+}
+
+.record-wrap{
+    position:relative;
+    width:min(350px,70vw);
+    aspect-ratio:1;
+    display:grid;
+    place-items:center;
+}
+
+.record{
+    width:100%;
+    height:100%;
+    border-radius:50%;
+    background:
+        repeating-radial-gradient(circle,#080808 0 2px,#151515 2px 4px);
+    box-shadow:0 20px 55px rgba(0,0,0,.7),inset 0 0 30px rgba(255,255,255,.05);
+    transition:transform .4s ease;
+}
+
+.record.playing{animation:spinRecord 5s linear infinite;}
+
+@keyframes spinRecord{to{transform:rotate(360deg)}}
+
+.record-label{
+    position:absolute;
+    width:28%;
+    aspect-ratio:1;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    text-align:center;
+    padding:12px;
+    background:#9a7448;
+    color:#25160e;
+    font-family:'Cormorant Garamond',serif;
+    font-size:14px;
+}
+
+.record-hole{
+    position:absolute;
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#20120b;
+}
+
+.needle{
+    position:absolute;
+    right:2%;
+    top:4%;
+    width:110px;
+    height:4px;
+    background:#bda276;
+    transform:rotate(38deg);
+    transform-origin:right center;
+    box-shadow:0 0 8px rgba(0,0,0,.5);
+}
+
+.track-number{
+    font-size:9px;
+    letter-spacing:4px;
+    color:#a88a61;
+}
+
+.track-title{
+    font-family:'Cormorant Garamond',serif;
+    font-size:26px;
+    text-align:center;
+}
+
+.track-artist{
+    margin-top:-2px;
+    font-size:10px;
+    letter-spacing:2px;
+    text-transform:uppercase;
+    color:#a88a61;
+    text-align:center;
+}
+.lyrics-window{
+    height:112px;
+    overflow:hidden;
+    position:relative;
+    mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%);
+    -webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%);
+}
+.lyrics-text{
+    will-change:transform;
+    transition:transform .45s cubic-bezier(.22,.61,.36,1);
+    padding:42px 0;
+}
+.lyric-line{
+    min-height:31px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:4px 8px;
+    opacity:.28;
+    transform:scale(.94);
+    transition:opacity .3s ease,transform .35s ease,color .3s ease,filter .3s ease;
+}
+.lyric-line.passed{opacity:.42;}
+.lyric-line.active{
+    opacity:1;
+    color:#fff0d2;
+    transform:scale(1.06);
+    filter:drop-shadow(0 0 7px rgba(221,184,123,.18));
+}
+.lyrics-status{
+    margin-top:7px;
+    font-size:8px;
+    letter-spacing:1.8px;
+    color:#806748;
+    text-transform:uppercase;
+}
+
+.music-controls{
+    display:flex;
+    gap:10px;
+}
+
+.music-control{
+    width:48px;
+    height:42px;
+    border:1px solid rgba(205,167,105,.35);
+    background:#2d1b12;
+    color:#d5b986;
+    cursor:pointer;
+}
+
+.music-control.main{width:58px;background:#70452c;}
+
+#favoritesPage .special-inner{max-width:1100px;}
+
+/* LYRICS */
+.lyrics-box{
+    width:min(520px,92%);
+    max-height:150px;
+    overflow:auto;
+    padding:15px 18px;
+    border:1px solid rgba(205,167,105,.22);
+    background:rgba(24,13,8,.62);
+    text-align:center;
+    box-shadow:inset 0 0 30px rgba(0,0,0,.18);
+}
+.lyrics-label{
+    font-size:7px;
+    letter-spacing:3px;
+    color:#a88a61;
+    margin-bottom:8px;
+}
+.lyrics-text{
+    font-family:'Cormorant Garamond',serif;
+    font-size:17px;
+    line-height:1.45;
+    color:#e9d7b8;
+    white-space:pre-line;
+}
+
+.music-control, .top-btn, #miniMusicToggle{
+    transition:transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.music-control:active, .top-btn:active, #miniMusicToggle:active{
+    transform:scale(.88);
+}
+.music-control:hover, .top-btn:hover, #miniMusicToggle:hover{
+    transform:translateY(-2px);
+    border-color:rgba(225,190,132,.7);
+    box-shadow:0 7px 18px rgba(0,0,0,.28);
+}
+.top-btn#musicButton{
+    position:relative;
+}
+.top-btn#musicButton.is-playing{
+    animation:musicPulse 1.5s ease-in-out infinite;
+    background:#70452c;
+}
+@keyframes musicPulse{
+    0%,100%{box-shadow:0 0 0 rgba(205,167,105,0);}
+    50%{box-shadow:0 0 18px rgba(205,167,105,.28);}
+}
+
+.reader-music-mini{
+    display:none;
+    align-items:center;
+    gap:10px;
+    width:min(430px,100%);
+    margin:0 auto 18px;
+    padding:9px 11px;
+    border:1px solid rgba(118,86,56,.32);
+    background:rgba(61,39,25,.78);
+    box-shadow:0 8px 25px rgba(42,25,15,.12);
+}
+.reader-music-mini.show{display:flex;}
+.mini-vinyl{
+    width:34px;height:34px;flex:none;border-radius:50%;
+    display:grid;place-items:center;
+    background:repeating-radial-gradient(circle,#111 0 2px,#252525 2px 4px);
+    color:#d5b986;font-size:13px;
+}
+.reader-music-mini.show .mini-vinyl{animation:spinMini 3.5s linear infinite;}
+@keyframes spinMini{to{transform:rotate(360deg)}}
+.mini-track{min-width:0;flex:1;text-align:left;}
+.mini-track small{display:block;font-size:6px;letter-spacing:2px;color:#9d866d;}
+.mini-track strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:500;color:#4d311f;}
+#miniMusicToggle{width:35px;height:35px;flex:none;border:1px solid rgba(118,86,56,.45);background:#68432c;color:#f3e4ca;cursor:pointer;}
+
+.favorites-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+    gap:15px;
+}
+
+.favorite-card{
+    min-height:190px;
+    display:flex;
+    overflow:hidden;
+    border:1px solid rgba(205,167,105,.22);
+    background:#29180f;
+}
+
+.favorite-spine{
+    width:62px;
+    flex:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#68432c;
+}
+
+.favorite-spine span{
+    writing-mode:vertical-rl;
+    transform:rotate(180deg);
+    font-family:'Cormorant Garamond',serif;
+    font-size:14px;
+    color:#f0dfbd;
+}
+
+.favorite-info{
+    padding:20px;
+    flex:1;
+}
+
+.favorite-info small{
+    font-size:8px;
+    letter-spacing:2px;
+    color:#bda276;
+}
+
+.favorite-info h3{
+    margin:8px 0 5px;
+    font-family:'Cormorant Garamond',serif;
+    font-size:25px;
+    font-weight:500;
+}
+
+.favorite-info p{
+    color:#9d866d;
+    font-size:11px;
+}
+
+.favorite-actions{
+    display:flex;
+    gap:7px;
+    margin-top:18px;
+}
+
+.favorite-actions button{
+    padding:8px 10px;
+    border:1px solid #765638;
+    background:transparent;
+    color:#d5b986;
+    font-size:8px;
+    letter-spacing:1px;
+    cursor:pointer;
+}
+
+.favorite-actions .open-favorite{background:#68432c;color:#f3e4ca;}
+
+#emptyFavorites{
+    padding:70px 20px;
+    text-align:center;
+    color:#9d866d;
+    font-family:'Cormorant Garamond',serif;
+    font-size:23px;
+}
+
+@media(max-width:800px){
+    .lyrics-box{max-height:135px;}
+    .lyrics-text{font-size:16px;}
+    .top-buttons{gap:5px;}
+    .top-btn{width:36px;height:36px;}
+    .special-page{padding:12px;}
+    .special-inner{padding:22px 16px;}
+    .music-stage{min-height:420px;}
+    .needle{width:75px;}
+    .favorites-grid{grid-template-columns:1fr;}
+}
+
+/* MOBILE */
+
+@media(max-width:800px){
+
+    .topbar{
+        height:70px;
+        padding:0 18px;
+    }
+
+    .logo{
+        font-size:23px;
+    }
+
+    .hero{
+        padding-top:40px;
+    }
+
+    .room-frame{
+        padding:0;
+    }
+
+    .side-shelf{
+        display:none;
+    }
+
+    .shelf-frame{
+        padding:20px 13px 28px;
+    }
+
+    .shelf-heading h2{
+        font-size:21px;
+    }
+
+    .open-label{
+        display:none;
+    }
+
+    .books-row{
+        height:160px;
+        gap:5px;
+    }
+
+    .book{
+        height:145px;
+    }
+
+    .book-title{
+        font-size:11px;
+    }
+
+    .shelf-row.zoomed{
+        width:96vw;
+    }
+
+    .shelf-row.zoomed .books-row{
+        height:250px;
+
+        justify-content:flex-start;
+
+        overflow-x:auto;
+
+        padding:0 10px;
+    }
+
+    .shelf-row.zoomed .book{
+        width:48px;
+        min-width:48px;
+        height:220px;
+    }
+
+    .shelf-row.zoomed .book-title{
+        font-size:12px;
+    }
+
+    #backButton{
+        top:82px;
+        left:15px;
+    }
+
+    .paper{
+        padding:50px 23px 35px;
+    }
+
+    #storyText{
+        font-size:18px;
+    }
+}
+\n/* AUTO LYRICS + BOOK LIFT */
+.lyrics-window{height:112px;overflow:hidden;position:relative;scroll-behavior:smooth;mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 18%,black 82%,transparent 100%)}
+.lyrics-text{display:flex;flex-direction:column;align-items:center;gap:7px;transform:translateY(0);transition:transform .55s cubic-bezier(.22,.61,.36,1);padding:30px 8px}
+.lyric-line{flex:none;width:100%;text-align:center;font-family:'Cormorant Garamond',serif;font-size:16px;line-height:1.15;color:rgba(233,215,184,.38);opacity:.55;transform:scale(.92);transition:color .45s ease,opacity .45s ease,transform .45s ease,filter .45s ease}
+.lyric-line.active{color:#f4dfb9;opacity:1;transform:scale(1.08);filter:drop-shadow(0 0 8px rgba(218,184,126,.2))}
+.lyric-line.passed{opacity:.25;transform:scale(.9)}
+.lyrics-window::after{content:"";position:absolute;left:15%;right:15%;top:50%;height:1px;background:rgba(215,179,119,.08);pointer-events:none}
+.books-row.book-lift-active{overflow:visible}
+.book.lifting{z-index:200!important;transform:translateY(-48px) translateZ(30px) scale(1.10) rotate(-2deg)!important;filter:brightness(1.18) saturate(1.05);box-shadow:inset -5px 0 7px rgba(0,0,0,.25),14px 24px 28px rgba(0,0,0,.5),0 0 22px rgba(213,178,119,.12);transition:transform .62s cubic-bezier(.18,.8,.25,1),filter .45s ease,box-shadow .45s ease!important}
+.book.lifting::after{border-color:rgba(245,220,180,.65)}
+.shelf-row.book-opening .book:not(.lifting){filter:brightness(.78);transition:filter .45s ease}
+@media(max-width:600px){.lyrics-window{height:104px}.lyric-line{font-size:15px}.book.lifting{transform:translateY(-34px) translateZ(20px) scale(1.07) rotate(-1deg)!important}}
+</style>
+</head>
+
+<body>
+
+<!-- INTRO -->
+
+<section id="intro">
+
+<div class="intro-content">
+
+<div class="intro-small">
+EST. IN THE LAND OF STORIES
+</div>
+
+<div class="intro-title">
+The Cozy<br>
+Fairytale Library
+</div>
+
+<div class="intro-subtitle">
+Every shelf holds a little world.
+</div>
+
+<button
+id="enterButton"
+type="button"
+onclick="
+document.getElementById('intro').classList.add('hide');
+setTimeout(function(){
+document.getElementById('intro').style.display='none';
+},850);
+">
+ENTER THE LIBRARY
+</button>
+
+</div>
+
+</section>
+
+
+<!-- LIBRARY -->
+
+<main class="library">
+
+<header class="topbar">
+
+<div class="logo">
+The Library
+<small>FAIRYTALE COLLECTION</small>
+</div>
+
+<div class="top-buttons">
+
+<button
+class="top-btn"
+id="nightButton"
+type="button"
+>☾</button>
+
+<button class="top-btn" id="musicButton" type="button" title="Music Room">♫</button>
+
+<button class="top-btn" id="bookmarkListButton" type="button" title="Favorite Stories">♡</button>
+
+</div>
+
+</header>
+
+
+<section class="hero">
+
+<div class="hero-label">
+WELCOME, READER
+</div>
+
+<h1>
+A House of Stories
+</h1>
+
+<p>
+Choose a shelf and enter its little world.
+</p>
+
+</section>
+
+
+<div class="search-container">
+
+<input
+id="search"
+type="text"
+placeholder="Search a story..."
+autocomplete="off"
+>
+
+</div>
+
+
+<button
+id="backButton"
+type="button"
+>
+← BACK TO LIBRARY
+</button>
+
+
+<div id="zoomOverlay"></div>
+
+
+<section
+class="library-room"
+id="libraryRoom"
+>
+
+<div class="room-frame">
+
+<div class="side-shelf side-left"></div>
+<div class="side-shelf side-right"></div>
+
+
+<div class="shelf-row">
+
+<div class="shelf-frame">
+
+<div class="shelf-heading">
+<h2>I · Classic Fairytales</h2>
+<span class="open-label">OPEN SHELF →</span>
+</div>
+
+<div class="books-row" id="shelf1"></div>
+
+</div>
+
+</div>
+
+
+<div class="shelf-row">
+
+<div class="shelf-frame">
+
+<div class="shelf-heading">
+<h2>II · Enchanted Kingdoms</h2>
+<span class="open-label">OPEN SHELF →</span>
+</div>
+
+<div class="books-row" id="shelf2"></div>
+
+</div>
+
+</div>
+
+
+<div class="shelf-row">
+
+<div class="shelf-frame">
+
+<div class="shelf-heading">
+<h2>III · Stories of Wonder</h2>
+<span class="open-label">OPEN SHELF →</span>
+</div>
+
+<div class="books-row" id="shelf3"></div>
+
+</div>
+
+</div>
+
+
+<div class="shelf-row">
+
+<div class="shelf-frame">
+
+<div class="shelf-heading">
+<h2>IV · Tales from the East</h2>
+<span class="open-label">OPEN SHELF →</span>
+</div>
+
+<div class="books-row" id="shelf4"></div>
+
+</div>
+
+</div>
+
+
+<div id="empty">
+No story was found in the library.
+</div>
+
+</div>
+
+</section>
+
+
+<footer>
+THE COZY FAIRYTALE LIBRARY · 37 STORIES
+</footer>
+
+</main>
+
+
+
+<!-- MUSIC ROOM -->
+<div class="special-page" id="musicRoom" aria-hidden="true">
+  <div class="special-inner">
+    <div class="special-head">
+      <div>
+        <div class="special-kicker">THE LIBRARY RECORD ROOM</div>
+        <h2 class="special-title">Music Room</h2>
+      </div>
+      <button class="special-close" id="musicClose" type="button">×</button>
+    </div>
+
+    <div class="music-stage">
+      <div class="record-wrap">
+        <div class="record" id="record"></div>
+        <div class="record-label">THE<br>LIBRARY</div>
+        <div class="record-hole"></div>
+        <div class="needle"></div>
+      </div>
+      <div class="track-number" id="trackNumber">01</div>
+      <div class="track-title" id="trackTitle">Magnolia</div>
+      <div class="track-artist" id="trackArtist">Magnolia Celebration</div>
+      <div class="lyrics-box" id="lyricsBox">
+        <div class="lyrics-label">NOW PLAYING · LYRICS</div>
+        <div class="lyrics-window" id="lyricsWindow">
+          <div class="lyrics-text" id="lyricsText"></div>
+        </div>
+      </div>
+      <div class="music-controls">
+        <button class="music-control" id="musicPrev" type="button">⏮</button>
+        <button class="music-control main" id="musicPlay" type="button">▶</button>
+        <button class="music-control" id="musicNext" type="button">⏭</button>
+      </div>
+    </div>
+  </div>
+  <audio id="musicAudio" preload="metadata"></audio>
+</div>
+
+<!-- FAVORITES -->
+<div class="special-page" id="favoritesPage" aria-hidden="true">
+  <div class="special-inner">
+    <div class="special-head">
+      <div>
+        <div class="special-kicker">YOUR PERSONAL SHELF</div>
+        <h2 class="special-title">Favorite Stories</h2>
+      </div>
+      <button class="special-close" id="favoritesClose" type="button">×</button>
+    </div>
+
+    <div class="favorites-grid" id="favoritesGrid"></div>
+    <div id="emptyFavorites">Your favorite shelf is empty.<br>Open a story and save it here.</div>
+  </div>
+</div>
+
+<!-- READER -->
+
+<div id="reader">
+
+<article class="paper">
+
+<button id="closeReader" type="button">
+×
+</button>
+
+<div id="storyCategory" class="category"></div>
+
+<h2 id="storyTitle"></h2>
+
+<div id="storyOrigin"></div>
+
+<div id="storyText"></div>
+
+<div class="reader-music-mini" id="readerMusicMini" aria-live="polite">
+  <div class="mini-vinyl"><span>♫</span></div>
+  <div class="mini-track">
+    <small>NOW PLAYING</small>
+    <strong id="miniTrackTitle">No music</strong>
+  </div>
+  <button id="miniMusicToggle" type="button" title="Play / pause music">Ⅱ</button>
+</div>
+
+<div class="reader-actions">
+
+<button id="bookmarkBtn" type="button">
+⎙ Save this story
+</button>
+
+</div>
+
+</article>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   37 CERITA
+========================================================= */
+
+const stories=[
+
+{
+id:1,
+title:"Cinderella",
+category:"Classic Fairytale",
+origin:"European fairytale tradition",
+color:"c1",
+text:[
+"Di sebuah kerajaan yang damai, hiduplah seorang gadis bernama Cinderella. Ia tinggal bersama ayahnya, ibu tirinya, dan dua saudara tirinya. Setelah ayahnya meninggal, kehidupan Cinderella berubah. Ia tidak lagi diperlakukan seperti anggota keluarga. Hampir seluruh pekerjaan rumah dibebankan kepadanya.",
+
+"Setiap pagi, Cinderella bangun sebelum matahari terbit. Ia menyalakan api, membersihkan rumah, menyiapkan sarapan, mencuci pakaian, dan merapikan kamar. Meski lelah, ia tetap berusaha tidak membalas perlakuan buruk keluarganya.",
+
+"Suatu hari, undangan dari istana datang. Pangeran akan mengadakan pesta besar selama satu malam.",
+
+"| \"Semua gadis di kerajaan boleh datang,\" kata pembawa pesan kerajaan.",
+
+"Cinderella tersenyum. Untuk pertama kalinya, ia membayangkan dirinya memakai gaun cantik dan melihat istana dari dekat.",
+
+"Namun ibu tirinya justru memberikan pekerjaan yang sangat banyak.",
+
+"| \"Selesaikan semua ini sebelum kau berpikir tentang pesta,\" katanya.",
+
+"Cinderella bekerja sampai sore. Ketika semua orang pergi, ia duduk sendirian di dekat jendela. Air matanya jatuh karena ia merasa tidak akan pernah memiliki kesempatan untuk merasakan kehidupan yang berbeda.",
+
+"Tiba-tiba, cahaya lembut muncul dari taman. Seorang peri datang menghampirinya.",
+
+"| \"Mengapa kau menangis, Cinderella?\" tanyanya.",
+
+"| \"Aku hanya ingin sekali pergi ke pesta. Bukan untuk menjadi orang lain, tetapi untuk merasakan bahwa aku juga pantas bahagia,\" jawab Cinderella.",
+
+"Peri itu tersenyum. Dengan sihirnya, labu berubah menjadi kereta, beberapa hewan menjadi pengiring, dan pakaian lama Cinderella berubah menjadi gaun indah.",
+
+"| \"Pergilah. Tetapi ingat, saat tengah malam, semua sihir ini akan berakhir,\" pesan peri.",
+
+"Cinderella tiba di istana. Tidak seorang pun mengenalinya. Pangeran melihatnya dan mengajaknya berdansa. Mereka berbicara tentang kehidupan, mimpi, dan hal-hal sederhana yang mereka sukai.",
+
+"Untuk pertama kalinya, Cinderella merasa didengarkan.",
+
+"Namun ketika lonceng hampir menunjukkan tengah malam, Cinderella teringat pesan peri.",
+
+"| \"Aku harus pergi sekarang,\" katanya.",
+
+"Ia berlari meninggalkan istana. Salah satu sepatu kacanya terlepas di tangga.",
+
+"Pangeran mengambil sepatu itu dan bertekad mencari gadis yang memakainya.",
+
+"Beberapa hari kemudian, rombongan kerajaan datang ke rumah Cinderella. Kedua saudara tirinya mencoba sepatu tersebut, tetapi tidak cocok.",
+
+"Cinderella maju dengan tenang.",
+
+"| \"Bolehkah aku mencobanya?\" tanyanya.",
+
+"Sepatu itu pas. Pangeran akhirnya menemukan gadis yang ia cari.",
+
+"Cinderella tidak lagi harus hidup dalam bayang-bayang keluarganya. Ia mendapatkan kesempatan untuk memulai kehidupan baru, tetapi yang paling penting, ia akhirnya menyadari bahwa harga dirinya tidak pernah ditentukan oleh perlakuan orang lain.",
+
+"Pesan Moral: Jangan biarkan perlakuan buruk orang lain membuatmu kehilangan kebaikan dalam dirimu. Kesabaran, keberanian, dan ketulusan dapat membawa seseorang menuju kehidupan yang lebih baik."
+]
+},
+
+{
+id:2,
+title:"Snow White",
+category:"Classic Fairytale",
+origin:"European fairytale tradition",
+color:"c2",
+text:[
+"Snow White adalah seorang putri yang dikenal karena sifatnya yang lembut. Ia tinggal di sebuah kerajaan bersama ibu tirinya, seorang ratu yang sangat memperhatikan kecantikan dan kedudukannya.",
+
+"Di kamar ratu terdapat sebuah cermin ajaib. Setiap pagi, ratu bertanya kepada cermin tersebut.",
+
+"| \"Cermin ajaib, siapakah perempuan tercantik di seluruh negeri?\"",
+
+"Selama bertahun-tahun cermin menjawab bahwa sang ratu adalah yang tercantik. Namun suatu hari jawabannya berubah.",
+
+"| \"Snow White kini lebih cantik darimu,\" jawab cermin.",
+
+"Ratu merasa sangat iri. Ia tidak sanggup menerima bahwa ada seseorang yang dianggap lebih cantik darinya.",
+
+"Snow White kemudian dibawa ke hutan oleh seorang pemburu. Namun pemburu itu tidak tega melakukan apa yang diperintahkan ratu.",
+
+"| \"Larilah sejauh mungkin. Jangan kembali ke istana,\" katanya.",
+
+"Snow White berjalan sendirian sampai menemukan sebuah rumah kecil. Rumah itu milik tujuh kurcaci yang bekerja di tambang.",
+
+"| \"Kami tidak keberatan jika kau tinggal di sini, selama kau mau menjaga rumah bersama kami,\" kata salah satu kurcaci.",
+
+"Snow White setuju. Ia membantu membersihkan rumah, memasak, dan merawat tempat tinggal mereka.",
+
+"Namun ratu akhirnya mengetahui bahwa Snow White masih hidup. Ia menyamar sebagai perempuan tua dan mendatangi rumah tersebut.",
+
+"| \"Aku mempunyai apel yang sangat manis. Maukah kau mencobanya?\" katanya.",
+
+"Snow White ragu, tetapi akhirnya menerima apel itu. Setelah menggigitnya, ia jatuh tertidur karena kutukan.",
+
+"Para kurcaci sangat sedih. Mereka menjaga Snow White dengan harapan suatu hari kutukan tersebut berakhir.",
+
+"Pada akhirnya, Snow White berhasil dibangunkan dan kembali mendapatkan kehidupannya.",
+
+"Pesan Moral: Rasa iri dapat membuat seseorang kehilangan akal sehat. Jangan menilai nilai diri berdasarkan kecantikan atau perbandingan dengan orang lain."
+]
+},
+
+{
+id:3,
+title:"Sleeping Beauty",
+category:"Classic Fairytale",
+origin:"European fairytale tradition",
+color:"c3",
+text:[
+"Ketika seorang putri lahir di sebuah kerajaan, raja dan ratu mengadakan pesta besar. Para tamu datang membawa hadiah dan doa untuk masa depan sang bayi.",
+
+"Namun seorang perempuan yang merasa tidak dihargai datang dengan kemarahan.",
+
+"| \"Aku memberikan hadiah yang tidak akan pernah kalian lupakan. Pada waktunya, sang putri akan tertusuk benda tajam dan tertidur sangat lama,\" katanya.",
+
+"Raja dan ratu ketakutan. Mereka berusaha melindungi putrinya dari segala benda tajam.",
+
+"Tahun demi tahun berlalu. Sang putri tumbuh menjadi gadis yang baik, ceria, dan sangat ingin tahu.",
+
+"Suatu sore, ia menemukan sebuah ruangan tua di bagian atas istana. Di dalamnya terdapat alat pemintal.",
+
+"| \"Apa benda ini?\" tanyanya.",
+
+"Ketika jarinya menyentuh alat tersebut, ia langsung tertidur.",
+
+"Keajaiban aneh terjadi. Seluruh istana ikut tertidur. Taman menjadi semakin lebat dan tanaman merambat menutupi dinding.",
+
+"Bertahun-tahun kemudian, kutukan tersebut akhirnya berakhir. Sang putri membuka matanya dan melihat bahwa seluruh istana kembali hidup.",
+
+"Ia menyadari bahwa banyak waktu telah berlalu, tetapi orang-orang yang menyayanginya tetap menunggunya.",
+
+"Pesan Moral: Ada hal-hal dalam hidup yang tidak dapat kita kendalikan. Kesabaran dan harapan membantu kita bertahan sampai keadaan berubah."
+]
+},
+
+{
+id:4,
+title:"Little Red Riding Hood",
+category:"Forest Tales",
+origin:"European folklore",
+color:"c4",
+text:[
+"Seorang gadis kecil yang selalu mengenakan tudung merah tinggal bersama ibunya di sebuah rumah dekat hutan. Karena itu, orang-orang memanggilnya Little Red Riding Hood.",
+
+"Suatu pagi, ibunya meminta ia mengantarkan makanan kepada nenek yang sedang sakit.",
+
+"| \"Jangan bermain terlalu lama. Jangan berbicara dengan orang asing dan tetaplah berada di jalan,\" pesan ibunya.",
+
+"| \"Baik, Ibu. Aku akan berhati-hati,\" jawabnya.",
+
+"Little Red Riding Hood berjalan melewati hutan sambil membawa keranjang.",
+
+"Di tengah perjalanan, seekor serigala menghampirinya.",
+
+"| \"Ke mana kau pergi sendirian?\" tanya serigala.",
+
+"| \"Aku akan mengunjungi nenekku,\" jawabnya.",
+
+"Serigala kemudian mengetahui lokasi rumah nenek. Ia mengambil jalan yang lebih cepat.",
+
+"Sesampainya di rumah nenek, serigala mencoba masuk lebih dahulu.",
+
+"Little Red Riding Hood akhirnya tiba. Ia merasa ada sesuatu yang aneh.",
+
+"| \"Nenek, mengapa suaramu berbeda?\" tanyanya.",
+
+"Situasi menjadi berbahaya, tetapi bantuan segera datang. Nenek berhasil diselamatkan dan Little Red Riding Hood menyadari kesalahannya.",
+
+"| \"Sekarang aku mengerti mengapa Ibu menyuruhku berhati-hati,\" katanya.",
+
+"Sejak saat itu, ia lebih mendengarkan nasihat orang dewasa dan tidak sembarangan berbicara dengan orang asing.",
+
+"Pesan Moral: Dengarkan nasihat orang yang menyayangimu. Rasa ingin tahu boleh dimiliki, tetapi keselamatan harus tetap menjadi prioritas."
+]
+},
+
+{
+id:5,
+title:"Rapunzel",
+category:"Enchanted Kingdoms",
+origin:"European fairytale tradition",
+color:"c5",
+text:[
+"Rapunzel tinggal di sebuah menara tinggi yang dikelilingi hutan. Menara itu tidak memiliki pintu biasa. Satu-satunya cara untuk mencapai jendelanya adalah melalui rambut Rapunzel yang sangat panjang.",
+
+"Setiap hari ia melihat dunia dari atas menara. Ia melihat burung terbang bebas, daun bergerak tertiup angin, dan matahari terbenam di balik pegunungan.",
+
+"| \"Seperti apa rasanya berjalan di bawah sana?\" pikirnya.",
+
+"Selama bertahun-tahun, Rapunzel hidup dalam kesendirian. Ia menyanyi untuk menghibur dirinya sendiri dan membaca apa pun yang tersedia.",
+
+"Suatu hari, seseorang menemukan menara tersebut.",
+
+"| \"Rapunzel, turunkan rambutmu!\" terdengar suara dari bawah.",
+
+"Rapunzel kemudian mulai mengetahui bahwa dunia di luar menara tidak sesederhana yang ia bayangkan. Ada orang baik, ada orang yang tidak dapat dipercaya, dan ada banyak hal yang harus dipelajari.",
+
+"Namun semakin lama, Rapunzel menyadari bahwa ia tidak ingin selamanya hidup dalam ketakutan.",
+
+"| \"Aku ingin memilih jalan hidupku sendiri,\" katanya.",
+
+"Ia kemudian menemukan keberanian untuk meninggalkan menara.",
+
+"Awalnya dunia terasa menakutkan. Ia tidak tahu harus pergi ke mana. Tetapi setiap langkah membuatnya semakin percaya pada kemampuannya sendiri.",
+
+"Pada akhirnya, Rapunzel menemukan tempat di mana ia dapat hidup bebas dan diterima.",
+
+"Pesan Moral: Kebebasan membutuhkan keberanian. Jangan takut memulai perjalanan baru hanya karena jalan di depan belum terlihat jelas."
+]
+},
+
+{
+id:6,
+title:"Hansel and Gretel",
+category:"Forest Tales",
+origin:"German folklore",
+color:"c6",
+text:[
+"Hansel dan Gretel adalah kakak beradik yang tinggal bersama keluarga mereka di dekat sebuah hutan.",
+
+"Suatu masa sulit datang dan persediaan makanan keluarga mereka semakin sedikit. Kedua anak itu akhirnya tersesat jauh di dalam hutan.",
+
+"| \"Jangan takut, Gretel. Kita pasti menemukan jalan pulang,\" kata Hansel.",
+
+"Mereka berjalan sepanjang hari sampai melihat rumah aneh yang dindingnya terbuat dari makanan manis.",
+
+"| \"Kita bisa makan sedikit saja,\" kata Gretel.",
+
+"Tanpa mereka sadari, rumah itu milik seorang perempuan tua yang menyimpan niat buruk.",
+
+"| \"Masuklah. Kalian pasti lapar,\" katanya.",
+
+"Hansel dan Gretel merasa curiga, tetapi mereka sudah terlalu lelah.",
+
+"Setelah mengetahui rencana perempuan itu, kedua saudara tersebut bekerja sama mencari cara untuk melarikan diri.",
+
+"| \"Kita harus tetap tenang. Kalau panik, kita tidak akan bisa berpikir,\" kata Gretel.",
+
+"Mereka akhirnya berhasil keluar dari rumah tersebut dan kembali berjalan melewati hutan.",
+
+"Setelah perjalanan panjang, mereka menemukan jalan pulang.",
+
+"Pengalaman itu membuat mereka semakin menghargai satu sama lain.",
+
+"Pesan Moral: Ketika menghadapi masalah, jangan menyerah pada ketakutan. Tetap tenang, berpikir cerdas, dan saling membantu."
+]
+},
+
+{
+id:7,
+title:"The Frog Prince",
+category:"Enchanted Kingdoms",
+origin:"European folklore",
+color:"c7",
+text:[
+"Seorang putri memiliki bola emas yang sangat disukainya. Suatu hari, ketika bermain di dekat kolam, bola itu jatuh ke dalam air.",
+
+"| \"Bola kesayanganku! Bagaimana aku mengambilnya?\" katanya.",
+
+"Seekor katak muncul dari permukaan air.",
+
+"| \"Aku bisa mengambil bola itu, tetapi kau harus berjanji menjadi temanku,\" katanya.",
+
+"Karena ingin mendapatkan bolanya kembali, sang putri menyetujui.",
+
+"Katak mengambil bola dan mengembalikannya. Namun setelah itu, sang putri pergi begitu saja.",
+
+"Katak kemudian datang ke istana untuk mengingatkan janjinya.",
+
+"| \"Janji tetaplah janji, bahkan jika kau mengucapkannya kepada seseorang yang berbeda darimu,\" katanya.",
+
+"Putri awalnya tidak nyaman. Namun setelah berbicara lebih lama, ia menyadari bahwa katak tersebut sebenarnya baik dan bijaksana.",
+
+"Ia mulai belajar bahwa penampilan bukanlah satu-satunya hal yang menentukan nilai seseorang.",
+
+"Keajaiban akhirnya terjadi dan katak tersebut kembali menjadi seorang pangeran.",
+
+"Pesan Moral: Jangan menilai seseorang hanya dari penampilan. Kenali sifat dan hatinya sebelum menentukan bagaimana kamu memandangnya."
+]
+},
+
+{
+id:8,
+title:"Beauty and the Beast",
+category:"Enchanted Kingdoms",
+origin:"European fairytale tradition",
+color:"c8",
+text:[
+"Belle adalah seorang gadis yang gemar membaca. Baginya, buku adalah jendela menuju dunia yang lebih luas.",
+
+"Suatu hari ayahnya tersesat dan menemukan sebuah kastel misterius. Di sana tinggal Beast, makhluk yang terlihat menakutkan.",
+
+"Beast marah karena ayah Belle mengambil bunga dari taman kastel.",
+
+"| \"Kau tidak boleh mengambil sesuatu tanpa izin,\" katanya.",
+
+"Belle kemudian memilih tinggal di kastel untuk menggantikan ayahnya.",
+
+"Awalnya ia takut. Beast memiliki suara keras dan wajah yang menyeramkan.",
+
+"Namun hari demi hari, Belle melihat sisi lain dirinya.",
+
+"Beast memberikan Belle sebuah perpustakaan yang sangat besar.",
+
+"| \"Semua buku ini untukku?\" tanya Belle.",
+
+"| \"Aku tahu kau menyukai membaca,\" jawab Beast.",
+
+"Belle mulai melihat bahwa Beast sebenarnya mampu melakukan kebaikan. Beast juga belajar mengendalikan kemarahannya dan memperhatikan perasaan orang lain.",
+
+"| \"Aku tidak ingin kau takut kepadaku,\" kata Beast suatu hari.",
+
+"Belle menyadari bahwa seseorang dapat berubah ketika diberi kesempatan untuk belajar.",
+
+"Pada akhirnya, kutukan yang menimpa kastel berakhir.",
+
+"Pesan Moral: Jangan menilai seseorang hanya berdasarkan penampilan. Empati memberi kita kesempatan untuk melihat sisi seseorang yang tidak terlihat dari luar."
+]
+},
+
+{
+id:9,
+title:"The Little Mermaid",
+category:"Sea Tales",
+origin:"European literary fairytale",
+color:"c9",
+text:[
+"Jauh di dasar laut terdapat sebuah kerajaan yang indah. Di sana tinggal seorang putri duyung muda yang selalu penasaran dengan dunia manusia.",
+
+"Setiap kali mendapat kesempatan, ia berenang mendekati permukaan laut dan memperhatikan kapal-kapal.",
+
+"| \"Aku ingin tahu bagaimana kehidupan manusia,\" katanya.",
+
+"Suatu hari, ia melihat sebuah kapal besar. Di atasnya terdapat seorang pangeran. Tiba-tiba badai datang dan membuat kapal tersebut mengalami masalah.",
+
+"Putri duyung membantu menyelamatkan sang pangeran dan memastikan ia sampai ke pantai.",
+
+"Setelah kejadian itu, keinginannya untuk melihat dunia manusia semakin besar.",
+
+"Namun ia harus membuat pilihan yang sulit. Ia ingin mendapatkan kehidupan yang berbeda, tetapi setiap pilihan memiliki harga.",
+
+"| \"Aku harus memikirkan apa yang sebenarnya kuinginkan, bukan hanya apa yang terlihat indah,\" pikirnya.",
+
+"Perjalanannya membuatnya memahami bahwa menjadi diri sendiri sama pentingnya dengan mengejar impian.",
+
+"Pesan Moral: Jangan mengejar sesuatu hanya karena terlihat indah dari jauh. Kenali dirimu sendiri dan pikirkan konsekuensi sebelum mengambil keputusan."
+]
+},
+
+{
+id:10,
+title:"Jack and the Beanstalk",
+category:"Stories of Wonder",
+origin:"English folklore",
+color:"c10",
+text:[
+"Jack tinggal bersama ibunya dalam keadaan sederhana. Mereka hanya memiliki seekor sapi sebagai sumber penghasilan.",
+
+"Suatu hari ibunya meminta Jack menjual sapi tersebut ke pasar.",
+
+"| \"Jangan pulang tanpa membawa sesuatu yang berguna,\" pesan ibunya.",
+
+"Di perjalanan, Jack bertemu seorang asing yang menawarkan biji ajaib.",
+
+"| \"Tanamlah ini dan lihat apa yang terjadi,\" kata orang tersebut.",
+
+"Jack menerima tawaran itu.",
+
+"Ketika pulang, ibunya sangat kecewa karena sapi mereka tidak lagi ada.",
+
+"| \"Kau harus belajar berpikir sebelum membuat keputusan,\" katanya.",
+
+"Namun keesokan paginya, sebuah tanaman raksasa tumbuh sampai ke langit.",
+
+"Jack memanjatnya dan menemukan dunia di atas awan.",
+
+"Di sana terdapat sebuah kastel milik raksasa.",
+
+"Jack menghadapi banyak bahaya. Ia akhirnya menyadari bahwa keberanian saja tidak cukup. Ia juga harus menggunakan akal sehat.",
+
+"Setelah kembali ke rumah, Jack menjadi lebih bertanggung jawab dan tidak lagi mengambil keputusan secara terburu-buru.",
+
+"Pesan Moral: Keberanian adalah hal baik, tetapi keputusan harus disertai pertimbangan. Belajarlah dari kesalahan."
+]
+},
+
+{
+id:11,
+title:"Goldilocks and the Three Bears",
+category:"Forest Tales",
+origin:"English folklore",
+color:"c11",
+text:[
+"Goldilocks adalah seorang gadis yang senang berjalan-jalan di hutan. Suatu hari ia menemukan sebuah rumah kecil yang tampak kosong.",
+
+"| \"Apakah ada orang di rumah?\" tanyanya.",
+
+"Tidak ada jawaban.",
+
+"Goldilocks masuk dan menemukan tiga mangkuk bubur.",
+
+"| \"Yang ini terlalu panas. Yang ini terlalu dingin. Yang ini pas!\" katanya.",
+
+"Setelah makan, ia mencoba tiga kursi.",
+
+"Namun kursi kecil yang ia duduki patah.",
+
+"| \"Ups... aku harus lebih berhati-hati,\" katanya.",
+
+"Goldilocks kemudian melihat tiga tempat tidur dan akhirnya tertidur.",
+
+"Tidak lama kemudian, pemilik rumah pulang. Mereka adalah tiga beruang.",
+
+"| \"Ada seseorang yang masuk ke rumah kita,\" kata beruang besar.",
+
+"Goldilocks terbangun dan menyadari kesalahannya.",
+
+"| \"Maaf. Aku seharusnya tidak masuk tanpa izin,\" katanya.",
+
+"Ia kemudian pulang dan belajar menghormati milik orang lain.",
+
+"Pesan Moral: Rasa ingin tahu harus disertai sopan santun. Jangan memasuki tempat atau menggunakan barang milik orang lain tanpa izin."
+]
+},
+
+{
+id:12,
+title:"The Three Little Pigs",
+category:"Forest Tales",
+origin:"European folklore",
+color:"c12",
+text:[
+"Tiga anak babi memutuskan untuk hidup mandiri dan membangun rumah masing-masing.",
+
+"Babi pertama ingin selesai paling cepat. Ia membuat rumah dari jerami.",
+
+"| \"Aku selesai! Sekarang aku bisa bermain,\" katanya.",
+
+"Babi kedua membuat rumah dari kayu.",
+
+"| \"Rumahku lebih kuat dan aku juga tidak perlu bekerja terlalu lama,\" katanya.",
+
+"Babi ketiga memilih batu bata.",
+
+"| \"Aku mungkin membutuhkan waktu lebih lama, tetapi aku ingin rumah yang benar-benar kuat,\" jawabnya.",
+
+"Suatu hari seekor serigala datang.",
+
+"| \"Bukakan pintu!\" seru serigala.",
+
+"Kedua babi pertama ketakutan. Rumah mereka tidak cukup kuat menghadapi serigala.",
+
+"Mereka kemudian berlari ke rumah babi ketiga.",
+
+"Rumah batu bata tetap berdiri.",
+
+"| \"Sekarang kita aman karena kita bekerja dengan sungguh-sungguh sejak awal,\" kata babi ketiga.",
+
+"Pesan Moral: Jangan memilih cara tercepat hanya karena lebih mudah. Kerja keras dan persiapan akan sangat berguna ketika masalah datang."
+]
+},
+
+{
+id:13,
+title:"Puss in Boots",
+category:"Stories of Wonder",
+origin:"European fairytale tradition",
+color:"c13",
+text:[
+"Seorang pemuda miskin mendapatkan warisan berupa seekor kucing.",
+
+"| \"Hanya seekor kucing? Apa yang bisa kulakukan dengannya?\" pikirnya.",
+
+"Ternyata kucing itu sangat cerdas.",
+
+"| \"Berikan aku sepatu dan sebuah kesempatan. Aku akan mengubah hidupmu,\" katanya.",
+
+"Kucing tersebut mulai membuat rencana. Ia menggunakan kecerdikannya untuk membuat banyak orang mengira bahwa tuannya adalah seorang bangsawan kaya.",
+
+"Perjalanannya tidak selalu mudah. Ia harus berhati-hati agar rencananya tidak terbongkar.",
+
+"| \"Aku mungkin kecil, tetapi aku tidak takut berpikir,\" katanya.",
+
+"Setiap masalah diselesaikan dengan kecerdikan.",
+
+"Akhirnya, tuannya mendapatkan kesempatan hidup yang lebih baik.",
+
+"Namun sang kucing juga mengajarkan bahwa keberuntungan harus disertai tanggung jawab.",
+
+"Pesan Moral: Jangan meremehkan kemampuan seseorang hanya karena penampilannya sederhana. Kecerdikan dapat menjadi kekuatan besar."
+]
+},
+
+{
+id:14,
+title:"The Ugly Duckling",
+category:"Stories of Wonder",
+origin:"European literary fairytale",
+color:"c14",
+text:[
+"Seekor anak burung lahir berbeda dari saudara-saudaranya. Tubuhnya lebih besar dan bulunya berwarna berbeda.",
+
+"Burung-burung lain sering menertawakannya.",
+
+"| \"Kau aneh sekali,\" kata mereka.",
+
+"Anak burung itu menjadi sedih dan memilih pergi.",
+
+"Musim dingin datang. Ia harus menghadapi kesepian dan rasa takut.",
+
+"| \"Mungkin memang tidak ada tempat untukku,\" pikirnya.",
+
+"Namun ia terus tumbuh.",
+
+"Ketika musim semi tiba, ia melihat sekumpulan angsa berenang di danau.",
+
+"| \"Mereka sangat indah,\" katanya.",
+
+"Ia kemudian melihat bayangannya sendiri di air dan terkejut.",
+
+"Burung yang selama ini ia kira buruk ternyata telah tumbuh menjadi angsa yang anggun.",
+
+"Untuk pertama kalinya, ia memahami bahwa masalahnya bukan karena dirinya tidak berharga. Ia hanya berada di tempat yang belum bisa menghargainya.",
+
+"Pesan Moral: Jangan membiarkan perkataan orang lain menentukan nilai dirimu. Setiap orang memiliki proses pertumbuhan yang berbeda."
+]
+},
+
+{
+id:15,
+title:"The Emperor's New Clothes",
+category:"Stories of Wonder",
+origin:"European literary fairytale",
+color:"c15",
+text:[
+"Seorang kaisar sangat menyukai pakaian indah. Ia bahkan lebih sering memikirkan pakaian daripada urusan kerajaannya.",
+
+"Suatu hari dua orang penipu datang dan mengaku dapat membuat kain yang hanya bisa dilihat oleh orang pintar.",
+
+"| \"Orang bodoh tidak akan mampu melihat kain kami,\" kata mereka.",
+
+"Kaisar ingin terlihat pintar sehingga ia berpura-pura melihat kain tersebut.",
+
+"| \"Indah sekali,\" katanya, meskipun sebenarnya ia tidak melihat apa pun.",
+
+"Para pejabat juga takut dianggap bodoh sehingga ikut berpura-pura.",
+
+"Akhirnya kaisar mengenakan pakaian yang sebenarnya tidak ada.",
+
+"Ketika ia berjalan di depan rakyat, semua orang diam karena takut.",
+
+"Namun seorang anak kecil tidak memahami ketakutan tersebut.",
+
+"| \"Kenapa semua orang diam? Kaisar tidak memakai pakaian!\" serunya.",
+
+"Orang-orang mulai menyadari bahwa mereka semua telah takut mengatakan kenyataan.",
+
+"Pesan Moral: Jangan takut berkata jujur hanya karena orang lain memiliki pendapat berbeda. Kejujuran membutuhkan keberanian."
+]
+},
+
+{
+id:16,
+title:"The Princess and the Pea",
+category:"Enchanted Kingdoms",
+origin:"European literary fairytale",
+color:"c16",
+text:[
+"Seorang pangeran ingin menemukan seorang putri sejati untuk menjadi pasangannya.",
+
+"Namun ia tidak ingin memilih hanya berdasarkan pakaian atau penampilan.",
+
+"Suatu malam, seorang gadis datang ke istana saat hujan sangat deras.",
+
+"| \"Aku adalah seorang putri,\" katanya.",
+
+"Ratu masih ragu. Ia ingin mengetahui apakah gadis tersebut mengatakan yang sebenarnya.",
+
+"Ratu menyiapkan tempat tidur dengan banyak kasur. Di bawah kasur paling bawah, ia meletakkan sebuah kacang kecil.",
+
+"Keesokan paginya, gadis itu mengatakan bahwa tidurnya tidak nyaman.",
+
+"| \"Ada sesuatu yang membuatku sulit tidur,\" katanya.",
+
+"Ratu kemudian percaya bahwa gadis tersebut benar-benar sangat peka.",
+
+"Pesan Moral: Hal kecil dapat memberikan pelajaran besar. Jangan meremehkan sesuatu hanya karena ukurannya kecil atau terlihat sederhana."
+]
+},
+
+{
+id:17,
+title:"The Elves and the Shoemaker",
+category:"Stories of Wonder",
+origin:"European folklore",
+color:"c17",
+text:[
+"Seorang pembuat sepatu tua tinggal bersama istrinya. Usahanya semakin sepi dan ia hampir tidak memiliki uang.",
+
+"Suatu malam ia hanya memiliki bahan untuk membuat satu pasang sepatu.",
+
+"| \"Besok aku akan menyelesaikannya,\" katanya.",
+
+"Namun ketika bangun, ia menemukan sepasang sepatu yang sangat indah sudah selesai.",
+
+"| \"Siapa yang membuat ini?\" tanyanya.",
+
+"Sepatu itu terjual dengan harga tinggi. Ia kemudian membeli bahan lebih banyak.",
+
+"Keesokan harinya, sepatu kembali sudah selesai.",
+
+"Hal itu terjadi berkali-kali.",
+
+"Akhirnya ia dan istrinya memutuskan berjaga pada malam hari.",
+
+"Mereka melihat beberapa makhluk kecil datang diam-diam dan membantu membuat sepatu.",
+
+"| \"Jadi kalian yang selama ini membantu kami,\" kata pembuat sepatu.",
+
+"Pasangan tersebut sangat berterima kasih.",
+
+"Pesan Moral: Kebaikan dapat muncul dari tempat yang tidak kita duga. Jangan lupa berterima kasih kepada orang yang membantu kita."
+]
+},
+
+{
+id:18,
+title:"The Gingerbread Man",
+category:"Forest Tales",
+origin:"English-language folklore",
+color:"c18",
+text:[
+"Seorang perempuan tua membuat kue jahe berbentuk manusia.",
+
+"Setelah matang, kue itu tiba-tiba hidup dan melompat keluar dari dapur.",
+
+"| \"Aku hidup! Tangkap aku kalau bisa!\" teriaknya.",
+
+"Ia berlari melewati rumah, ladang, dan jalan.",
+
+"Orang-orang mencoba mengejarnya tetapi ia selalu berhasil melarikan diri.",
+
+"| \"Tidak ada yang bisa menangkapku!\" katanya dengan bangga.",
+
+"Namun akhirnya ia sampai di sebuah sungai.",
+
+"Ia tidak dapat berenang.",
+
+"Seekor rubah menawarkan bantuan.",
+
+"| \"Naiklah ke punggungku. Aku akan membawamu ke seberang,\" kata rubah.",
+
+"Kue jahe menerima tawaran itu.",
+
+"Petualangan tersebut mengajarkannya bahwa terlalu percaya diri dapat membuat seseorang lengah.",
+
+"Pesan Moral: Percaya diri itu baik, tetapi jangan sampai membuat kita mengabaikan bahaya atau terlalu mudah mempercayai orang lain."
+]
+},
+
+{
+id:19,
+title:"The Little Match Girl",
+category:"Winter Tales",
+origin:"European literary fairytale",
+color:"c19",
+text:[
+"Pada malam musim dingin yang sangat dingin, seorang gadis kecil berjalan sendirian di jalan. Ia membawa kotak berisi korek api untuk dijual.",
+
+"Orang-orang berjalan melewatinya tanpa memperhatikan.",
+
+"| \"Maukah membeli korek api?\" tanyanya.",
+
+"Tidak ada yang berhenti.",
+
+"Karena kedinginan, ia menyalakan satu korek api. Cahaya kecil itu membuatnya membayangkan rumah hangat dengan meja makan penuh makanan.",
+
+"| \"Seandainya aku berada di tempat yang hangat,\" pikirnya.",
+
+"Ketika api padam, ia menyalakan korek berikutnya. Kali ini ia membayangkan orang-orang yang ia sayangi.",
+
+"Bayangan tersebut membuatnya merasa tidak sendirian.",
+
+"Kisahnya menjadi pengingat bahwa banyak orang di dunia dapat mengalami kesulitan tanpa terlihat oleh orang lain.",
+
+"Pesan Moral: Jangan mengabaikan orang yang sedang membutuhkan bantuan. Kepedulian kecil dapat berarti sangat besar."
+]
+},
+
+{
+id:20,
+title:"The Pied Piper",
+category:"Stories of Wonder",
+origin:"German folklore",
+color:"c20",
+text:[
+"Sebuah kota mengalami masalah besar karena tikus memenuhi jalan, rumah, dan gudang makanan.",
+
+"Penduduk sudah mencoba banyak cara tetapi tidak berhasil.",
+
+"Suatu hari seorang pemain musik misterius datang.",
+
+"| \"Aku bisa mengusir semua tikus dari kota ini,\" katanya.",
+
+"Penduduk menyetujui imbalan untuknya.",
+
+"Pemain musik memainkan lagu yang aneh tetapi indah. Tikus-tikus keluar dan mengikuti musik tersebut sampai meninggalkan kota.",
+
+"Namun setelah masalah selesai, para penduduk tidak menepati janji.",
+
+"| \"Kami tidak perlu membayarmu lagi,\" kata salah seorang warga.",
+
+"Pemain musik kecewa.",
+
+"Kisah tersebut kemudian dikenang sebagai pelajaran tentang akibat dari janji yang tidak ditepati.",
+
+"Pesan Moral: Janji adalah tanggung jawab. Jangan membuat janji jika tidak berniat menepatinya."
+]
+},
+
+{
+id:21,
+title:"Aladdin",
+category:"Tales from the East",
+origin:"Arabian Nights tradition",
+color:"c21",
+text:[
+"Aladdin adalah seorang pemuda yang hidup sederhana. Ia sering bermimpi mendapatkan kehidupan yang lebih baik.",
+
+"Suatu hari, seorang asing mengajaknya mencari sebuah lampu tua di tempat tersembunyi.",
+
+"Aladdin berhasil menemukan lampu tersebut.",
+
+"Ketika ia menggosok permukaannya, muncul seorang jin.",
+
+"| \"Aku adalah jin yang terikat pada lampu ini. Apa yang kau inginkan?\" tanyanya.",
+
+"Aladdin awalnya tidak percaya.",
+
+"Namun setelah melihat kekuatan jin tersebut, ia mulai menggunakan kesempatan itu untuk mengubah hidupnya.",
+
+"Sayangnya, semakin banyak yang ia dapatkan, semakin besar pula masalah yang datang.",
+
+"| \"Aku tidak bisa membiarkan keajaiban menyelesaikan semuanya untukku,\" katanya.",
+
+"Aladdin akhirnya belajar menggunakan kecerdikan dan keberanian sendiri.",
+
+"Pesan Moral: Kesempatan besar harus digunakan dengan bijaksana. Kekayaan dan kekuasaan tidak berarti jika tidak disertai tanggung jawab."
+]
+},
+
+{
+id:22,
+title:"Ali Baba and the Forty Thieves",
+category:"Tales from the East",
+origin:"Arabian Nights tradition",
+color:"c22",
+text:[
+"Ali Baba adalah seorang penebang kayu yang hidup sederhana.",
+
+"Suatu hari, ketika sedang bekerja di hutan, ia melihat sekelompok orang datang membawa banyak barang.",
+
+"Mereka berhenti di depan sebuah batu besar.",
+
+"| \"Open Sesame!\" seru pemimpin mereka.",
+
+"Pintu batu terbuka dan mereka masuk.",
+
+"Ali Baba menunggu sampai mereka pergi. Ia kemudian mencoba kata yang sama.",
+
+"Pintu terbuka dan ia menemukan harta yang sangat banyak.",
+
+"Namun Ali Baba sadar bahwa harta tersebut bukan miliknya.",
+
+"Ia mengambil secukupnya dan pergi.",
+
+"Ketika para pencuri mengetahui ada seseorang yang mengetahui rahasia mereka, bahaya mulai datang.",
+
+"Ali Baba harus menggunakan kecerdikan dan keberanian untuk menyelamatkan dirinya.",
+
+"Pesan Moral: Jangan biarkan keserakahan menguasai diri. Kekayaan yang diperoleh tanpa tanggung jawab dapat membawa masalah besar."
+]
+},
+
+{
+id:23,
+title:"Sinbad the Sailor",
+category:"Tales from the East",
+origin:"Arabian Nights tradition",
+color:"c23",
+text:[
+"Sinbad adalah seorang pelaut yang tidak pernah puas hanya melihat tempat yang sama.",
+
+"| \"Dunia terlalu luas untuk hanya tinggal di satu tempat,\" katanya.",
+
+"Ia melakukan perjalanan dari satu negeri ke negeri lain.",
+
+"Dalam sebuah perjalanan, kapal Sinbad terkena badai besar. Ia hampir kehilangan seluruh barang yang dibawanya.",
+
+"Di perjalanan lain, ia menemukan pulau yang ternyata bukan pulau, melainkan makhluk raksasa yang sedang tidur.",
+
+"Sinbad harus menggunakan akalnya untuk menyelamatkan diri.",
+
+"Setiap perjalanan memberinya pengalaman baru.",
+
+"| \"Aku memang kehilangan banyak hal, tetapi aku pulang membawa pelajaran,\" katanya.",
+
+"Setelah bertahun-tahun, Sinbad memahami bahwa perjalanan bukan hanya tentang harta.",
+
+"Pesan Moral: Pengalaman dan pengetahuan adalah harta yang tidak mudah hilang. Berani belajar dari perjalanan hidup akan membuat kita semakin dewasa."
+]
+},
+
+{
+id:24,
+title:"The Twelve Dancing Princesses",
+category:"Enchanted Kingdoms",
+origin:"European folklore",
+color:"c24",
+text:[
+"Seorang raja memiliki dua belas putri. Setiap pagi ia menemukan sepatu mereka rusak seolah-olah telah dipakai menari semalaman.",
+
+"| \"Bagaimana sepatu kalian bisa rusak setiap hari?\" tanya raja.",
+
+"Para putri tidak memberikan jawaban.",
+
+"Banyak orang mencoba mencari tahu rahasia mereka, tetapi semuanya gagal.",
+
+"Seorang pemuda kemudian datang.",
+
+"| \"Izinkan aku mencoba mencari tahu,\" katanya.",
+
+"Pada malam hari, ia mengikuti para putri secara diam-diam.",
+
+"Mereka memasuki jalan rahasia menuju sebuah kerajaan bawah tanah.",
+
+"Di sana mereka menari hingga larut malam.",
+
+"| \"Jadi inilah rahasia mereka,\" pikir pemuda tersebut.",
+
+"Keesokan harinya ia menceritakan semuanya kepada raja.",
+
+"Pesan Moral: Rasa ingin tahu harus disertai ketelitian. Jangan mengambil kesimpulan sebelum benar-benar mengetahui apa yang terjadi."
+]
+},
+
+{
+id:25,
+title:"Thumbelina",
+category:"Stories of Wonder",
+origin:"European literary fairytale",
+color:"c25",
+text:[
+"Thumbelina adalah seorang gadis kecil yang ukurannya tidak lebih besar dari ibu jari.",
+
+"Karena ukurannya, ia sering merasa berbeda dari makhluk lain.",
+
+"| \"Mungkin aku terlalu kecil untuk dunia ini,\" pikirnya.",
+
+"Ia mengalami banyak perjalanan dan bertemu berbagai hewan.",
+
+"Beberapa orang mencoba menentukan hidupnya tanpa bertanya apa yang sebenarnya ia inginkan.",
+
+"Thumbelina perlahan belajar mengatakan tidak.",
+
+"| \"Aku ingin memilih tempat yang membuatku bahagia,\" katanya.",
+
+"Perjalanannya panjang, tetapi ia akhirnya menemukan tempat yang sesuai dengannya.",
+
+"Di sana ia bertemu makhluk lain yang memiliki ukuran dan kehidupan yang mirip dengannya.",
+
+"Thumbelina akhirnya memahami bahwa berbeda bukan berarti salah.",
+
+"Pesan Moral: Tidak semua orang harus mengikuti jalan yang sama. Kenali dirimu sendiri dan carilah lingkungan yang menghargai dirimu."
+]
+},
+
+{
+id:26,
+title:"The Snow Queen",
+category:"Winter Tales",
+origin:"European literary fairytale",
+color:"c26",
+text:[
+"Gerda dan Kai adalah dua sahabat yang sangat dekat. Mereka sering menghabiskan waktu bersama.",
+
+"Suatu hari, pecahan kaca ajaib membuat hati Kai menjadi dingin. Ia kemudian dibawa pergi oleh Snow Queen.",
+
+"Gerda sangat sedih, tetapi ia tidak mau menyerah.",
+
+"| \"Aku akan mencarinya,\" katanya.",
+
+"Ia berjalan jauh melewati salju, hutan, dan berbagai tempat asing.",
+
+"Di sepanjang perjalanan, banyak orang membantunya.",
+
+"Gerda tidak selalu kuat. Ada saat-saat ketika ia ingin berhenti.",
+
+"| \"Aku lelah, tetapi aku belum selesai,\" katanya.",
+
+"Akhirnya ia menemukan istana Snow Queen.",
+
+"Gerda membantu Kai mengingat kembali kenangan dan kasih sayang yang selama ini ia lupakan.",
+
+"Perjalanan itu mengajarkan bahwa ketulusan dapat bertahan bahkan ketika keadaan terasa sangat dingin.",
+
+"Pesan Moral: Jangan mudah menyerah ketika seseorang yang kamu sayangi membutuhkanmu. Ketulusan dan ketekunan dapat memberi harapan."
+]
+},
+
+{
+id:27,
+title:"The Wild Swans",
+category:"Enchanted Kingdoms",
+origin:"European folklore",
+color:"c27",
+text:[
+"Seorang putri memiliki beberapa saudara laki-laki yang terkena kutukan dan berubah menjadi angsa.",
+
+"Ia mengetahui bahwa kutukan tersebut dapat dipatahkan, tetapi tugasnya sangat sulit.",
+
+"| \"Aku akan melakukan apa pun untuk menyelamatkan mereka,\" katanya.",
+
+"Ia harus bekerja dalam diam dan tidak boleh menyerah meskipun orang lain tidak memahami tindakannya.",
+
+"Banyak orang menganggapnya aneh.",
+
+"| \"Tidak apa-apa jika mereka tidak mengerti. Aku tahu apa yang harus kulakukan,\" katanya.",
+
+"Hari berganti hari. Sang putri terus bekerja.",
+
+"Pada akhirnya, usaha panjangnya berhasil dan saudara-saudaranya kembali menjadi manusia.",
+
+"Pesan Moral: Ketulusan membutuhkan kesabaran. Tidak semua orang akan langsung memahami niat baik kita."
+]
+},
+
+{
+id:28,
+title:"The Golden Goose",
+category:"Stories of Wonder",
+origin:"European folklore",
+color:"c28",
+text:[
+"Seorang pemuda sederhana dikenal sebagai orang yang suka membantu.",
+
+"Suatu hari ia bertemu seseorang yang membutuhkan makanan. Ia berbagi apa yang dimilikinya.",
+
+"Sebagai balasan, ia mendapatkan seekor angsa emas.",
+
+"Ketika seseorang mencoba mengambil bulu angsa tersebut, tangannya justru menempel.",
+
+"| \"Tolong! Aku tidak bisa melepaskannya!\" teriaknya.",
+
+"Orang kedua mencoba membantu dan ikut menempel. Orang ketiga juga demikian.",
+
+"Tanpa sengaja terbentuk barisan panjang orang yang mengikuti angsa.",
+
+"Kejadian tersebut membuat orang-orang kerajaan tertawa sekaligus kagum.",
+
+"Pemuda sederhana itu kemudian mendapatkan kesempatan untuk mengubah hidupnya.",
+
+"Pesan Moral: Kebaikan yang dilakukan dengan tulus dapat membawa hasil yang tidak pernah kita bayangkan."
+]
+},
+
+{
+id:29,
+title:"The Bremen Town Musicians",
+category:"Forest Tales",
+origin:"German folklore",
+color:"c29",
+text:[
+"Seekor keledai tua merasa bahwa pemiliknya tidak lagi membutuhkannya.",
+
+"| \"Aku akan pergi ke Bremen dan menjadi musisi,\" katanya.",
+
+"Di perjalanan ia bertemu seekor anjing tua.",
+
+"| \"Aku juga tidak lagi berguna di rumah. Bolehkah aku ikut?\" tanya anjing.",
+
+"Seekor kucing dan ayam kemudian bergabung.",
+
+"Keempat hewan berjalan bersama.",
+
+"Malam tiba dan mereka menemukan rumah yang dihuni sekelompok perampok.",
+
+"Mereka menyusun rencana.",
+
+"| \"Kalau kita bersuara bersama, kita bisa membuat mereka takut,\" kata keledai.",
+
+"Mereka kemudian membuat suara keras dari luar jendela.",
+
+"Para perampok ketakutan dan melarikan diri.",
+
+"Keempat hewan akhirnya menemukan rumah yang aman untuk ditinggali.",
+
+"Pesan Moral: Setiap orang memiliki kemampuan yang berharga. Kerja sama dapat membuat kelemahan menjadi kekuatan."
+]
+},
+
+{
+id:30,
+title:"The Wolf and the Seven Kids",
+category:"Forest Tales",
+origin:"European folklore",
+color:"c30",
+text:[
+"Seekor induk kambing tinggal bersama tujuh anaknya.",
+
+"Suatu hari ia harus pergi mencari makanan.",
+
+"| \"Jangan membuka pintu untuk siapa pun selain ibu,\" pesannya.",
+
+"Serigala yang mendengar hal itu mencoba meniru suara induk kambing.",
+
+"| \"Bukakan pintu. Ini ibu,\" katanya.",
+
+"Anak-anak kambing mendengarkan baik-baik.",
+
+"| \"Suara itu berbeda. Itu bukan ibu,\" kata salah satu dari mereka.",
+
+"Serigala mencoba lagi.",
+
+"Anak-anak semakin berhati-hati.",
+
+"Akhirnya induk kambing pulang dan memeluk anak-anaknya.",
+
+"| \"Kalian sudah melakukan hal yang benar dengan berhati-hati,\" katanya.",
+
+"Pesan Moral: Jangan mudah percaya hanya karena seseorang terdengar meyakinkan. Perhatikan tanda-tanda dan gunakan penilaian yang hati-hati."
+]
+},
+
+{
+id:31,
+title:"The Fisherman and His Wife",
+category:"Stories of Wonder",
+origin:"European folklore",
+color:"c31",
+text:[
+"Seorang nelayan hidup sederhana bersama istrinya di sebuah rumah kecil.",
+
+"Suatu hari ia menangkap seekor ikan ajaib.",
+
+"| \"Lepaskan aku dan aku akan mengabulkan satu permintaanmu,\" kata ikan itu.",
+
+"Nelayan merasa kasihan dan melepaskannya tanpa meminta apa pun.",
+
+"Ketika pulang, ia menceritakan semuanya kepada istrinya.",
+
+"| \"Kembali dan mintalah rumah yang lebih bagus,\" kata istrinya.",
+
+"Nelayan mengikuti permintaannya.",
+
+"Namun setelah mendapatkan rumah baru, istrinya meminta sesuatu yang lebih besar lagi.",
+
+"| \"Aku ingin memiliki kekuasaan,\" katanya.",
+
+"Permintaan tersebut terus bertambah.",
+
+"Semakin banyak yang mereka miliki, semakin mereka merasa belum cukup.",
+
+"Pada akhirnya, semua yang mereka dapatkan hilang.",
+
+"Pesan Moral: Bersyukurlah atas apa yang dimiliki. Keserakahan membuat seseorang sulit merasakan cukup."
+]
+},
+
+{
+id:32,
+title:"The Six Swans",
+category:"Enchanted Kingdoms",
+origin:"European folklore",
+color:"c32",
+text:[
+"Enam saudara laki-laki terkena kutukan dan berubah menjadi angsa.",
+
+"Saudara perempuan mereka menemukan cara untuk mematahkan kutukan.",
+
+"Namun ia harus melakukan pekerjaan yang sangat sulit dan membutuhkan waktu lama.",
+
+"| \"Aku tidak akan meninggalkan kalian,\" katanya.",
+
+"Ia bekerja setiap hari meskipun merasa lelah.",
+
+"Orang-orang di sekitarnya tidak selalu memahami apa yang sedang ia lakukan.",
+
+"| \"Aku mungkin tidak bisa menjelaskan semuanya sekarang, tetapi aku tahu mengapa aku melakukannya,\" katanya.",
+
+"Setelah waktu yang panjang, kutukan akhirnya berhasil dipatahkan.",
+
+"Keenam saudaranya kembali menjadi manusia.",
+
+"Pesan Moral: Kasih sayang membutuhkan kesabaran. Ketika memperjuangkan sesuatu yang berarti, jangan mudah menyerah hanya karena prosesnya panjang."
+]
+},
+
+{
+id:33,
+title:"The Brave Little Tailor",
+category:"Stories of Wonder",
+origin:"European folklore",
+color:"c33",
+text:[
+"Seorang penjahit kecil sedang bekerja ketika ia berhasil membunuh beberapa lalat yang mengganggunya.",
+
+"Karena merasa bangga, ia membuat tulisan yang berbunyi bahwa ia telah mengalahkan tujuh dalam satu pukulan.",
+
+"Orang-orang salah memahami tulisan tersebut.",
+
+"| \"Jadi kau mengalahkan tujuh musuh sekaligus?\" tanya seseorang.",
+
+"Penjahit itu menyadari kesalahpahaman tersebut, tetapi ia tidak membiarkan ketakutan menghentikannya.",
+
+"Ia menghadapi berbagai tantangan.",
+
+"Karena tubuhnya kecil, orang-orang sering meremehkannya.",
+
+"| \"Kecil bukan berarti tidak berani,\" katanya.",
+
+"Ia menggunakan kecerdikan untuk menghadapi lawan yang lebih besar.",
+
+"Pada akhirnya, semua orang melihat bahwa keberanian tidak ditentukan oleh ukuran tubuh.",
+
+"Pesan Moral: Jangan meremehkan diri sendiri hanya karena terlihat kecil atau berbeda. Keberanian dan kecerdikan dapat mengubah keadaan."
+]
+},
+
+{
+id:34,
+title:"The Wonderful Wizard",
+category:"Stories of Wonder",
+origin:"American literary fairytale",
+color:"c34",
+text:[
+"Dorothy tinggal bersama keluarganya di sebuah rumah sederhana.",
+
+"Suatu hari badai besar datang. Angin begitu kuat hingga rumah Dorothy terangkat dan terbawa jauh.",
+
+"Ketika semuanya berhenti, Dorothy menemukan dirinya berada di negeri asing.",
+
+"| \"Aku ingin pulang,\" katanya.",
+
+"Ia kemudian diberi tahu bahwa seorang penyihir besar mungkin dapat membantunya.",
+
+"Dalam perjalanan, Dorothy bertemu orang-orangan sawah yang merasa tidak memiliki kecerdasan.",
+
+"| \"Aku berharap memiliki otak,\" katanya.",
+
+"Mereka kemudian bertemu manusia timah yang merasa tidak memiliki hati dan seekor singa yang merasa tidak memiliki keberanian.",
+
+"| \"Kita bisa berjalan bersama,\" kata Dorothy.",
+
+"Mereka menghadapi banyak bahaya.",
+
+"Namun tanpa disadari, orang-orangan sawah berkali-kali menunjukkan kecerdikan, manusia timah menunjukkan kepedulian, dan singa menunjukkan keberanian.",
+
+"Mereka akhirnya menyadari bahwa selama ini mereka telah memiliki hal-hal yang mereka cari.",
+
+"Pesan Moral: Terkadang kita sudah memiliki kekuatan yang kita cari. Percayalah pada dirimu sendiri dan jangan meremehkan kemampuanmu."
+]
+},
+
+{
+id:35,
+title:"Timun Mas",
+category:"Tales from Indonesia",
+origin:"Central Java folklore",
+color:"c35",
+text:[
+"Di sebuah desa hiduplah seorang perempuan bernama Mbok Srini. Ia hidup sederhana dan sangat ingin memiliki seorang anak.",
+
+"Suatu hari, seorang raksasa datang dan memberikan biji mentimun ajaib.",
+
+"| \"Tanamlah biji ini. Kelak kau akan mendapatkan seorang anak. Tetapi ketika anak itu besar, ia harus menjadi milikku,\" kata raksasa.",
+
+"Mbok Srini sangat ingin memiliki anak sehingga ia menerima syarat tersebut.",
+
+"Beberapa waktu kemudian, tumbuh sebuah mentimun berwarna emas. Ketika dibelah, di dalamnya terdapat seorang bayi perempuan.",
+
+"Mbok Srini menamainya Timun Mas.",
+
+"Tahun-tahun berlalu. Timun Mas tumbuh menjadi gadis yang rajin dan pemberani.",
+
+"Namun suatu hari raksasa datang menagih janjinya.",
+
+"| \"Serahkan Timun Mas kepadaku!\" teriak raksasa.",
+
+"Mbok Srini ketakutan tetapi tidak menyerah.",
+
+"| \"Lari sejauh mungkin. Ibu akan selalu mendoakanmu,\" katanya.",
+
+"Timun Mas membawa beberapa benda ajaib yang dapat digunakan untuk melawan raksasa.",
+
+"Ia berlari melewati hutan dan menggunakan benda-benda tersebut untuk menghambat pengejarnya.",
+
+"Akhirnya Timun Mas berhasil menyelamatkan dirinya dan kembali kepada ibunya.",
+
+"| \"Aku pulang, Bu,\" katanya sambil memeluk ibunya.",
+
+"Pesan Moral: Keberanian, usaha, dan kasih sayang keluarga dapat membantu seseorang menghadapi kesulitan besar. Jangan menyerah ketika menghadapi masalah."
+]
+},
+
+{
+id:36,
+title:"Bawang Merah dan Bawang Putih",
+category:"Tales from Indonesia",
+origin:"Indonesian folklore",
+color:"c36",
+text:[
+"Bawang Putih adalah seorang gadis yang rajin dan lembut. Ia tinggal bersama ibu tiri dan saudara tirinya, Bawang Merah.",
+
+"Bawang Putih sering melakukan semua pekerjaan rumah, sementara Bawang Merah lebih suka bersantai.",
+
+"Suatu hari, kain milik ibu tirinya hanyut ketika Bawang Putih mencuci di sungai.",
+
+"| \"Cari kain itu sampai ketemu!\" perintah ibu tirinya.",
+
+"Bawang Putih berjalan mengikuti aliran sungai.",
+
+"Setelah cukup jauh, ia bertemu seorang nenek yang tinggal sendirian.",
+
+"| \"Nenek, apakah Nenek melihat kain yang hanyut?\" tanya Bawang Putih.",
+
+"Nenek tersebut memang menemukan kain itu. Namun ia meminta Bawang Putih membantunya sebentar.",
+
+"Bawang Putih membantu membersihkan rumah dan menyiapkan makanan tanpa mengeluh.",
+
+"Sebagai ucapan terima kasih, nenek memberinya pilihan dua buah labu.",
+
+"| \"Pilihlah salah satunya,\" kata nenek.",
+
+"Bawang Putih memilih labu sederhana.",
+
+"Ketika dibuka di rumah, labu tersebut berisi benda-benda berharga.",
+
+"Bawang Merah dan ibunya menjadi iri. Mereka mencoba melakukan hal yang sama, tetapi mereka bersikap tidak tulus.",
+
+"Pesan Moral: Kebaikan yang dilakukan dengan tulus memiliki nilai yang jauh lebih besar daripada kebaikan yang dilakukan demi mendapatkan keuntungan."
+]
+},
+
+{
+id:37,
+title:"Keong Mas",
+category:"Tales from Indonesia",
+origin:"East Java folklore",
+color:"c37",
+text:[
+"Di sebuah kerajaan hiduplah seorang putri yang dikenal karena kebaikan hatinya. Namun sebuah kutukan membuat hidupnya berubah.",
+
+"Putri tersebut berubah menjadi seekor keong emas dan terbawa arus sungai.",
+
+"Setelah perjalanan panjang, keong itu ditemukan oleh seorang perempuan tua yang hidup sederhana.",
+
+"| \"Kasihan sekali. Aku akan membawamu pulang,\" kata perempuan itu.",
+
+"Perempuan tersebut tidak mengetahui bahwa keong emas itu sebenarnya seorang putri.",
+
+"Setiap kali perempuan tua pergi, sesuatu yang aneh terjadi. Rumahnya menjadi bersih dan makanan sudah tersedia.",
+
+"| \"Siapa yang melakukan semua ini?\" pikirnya.",
+
+"Suatu hari, ia berpura-pura pergi kemudian bersembunyi.",
+
+"Ia melihat keong emas berubah menjadi seorang gadis.",
+
+"| \"Jadi selama ini kau yang membantuku?\" tanyanya.",
+
+"Putri kemudian menceritakan semua yang terjadi.",
+
+"Perempuan tua itu tidak takut. Ia justru berusaha membantu sang putri.",
+
+"Pada akhirnya, kutukan tersebut berhasil dipatahkan.",
+
+"Putri dapat kembali ke kehidupannya dan tidak melupakan orang yang telah menolongnya ketika ia berada dalam keadaan sulit.",
+
+"Pesan Moral: Jangan meremehkan kebaikan kecil. Ketulusan dan kasih sayang dapat menjadi cahaya bagi seseorang yang sedang berada dalam masa sulit."
+]
+}
+
+];
+
+
+/* =========================================================
+   CREATE BOOKS
+========================================================= */
+
+function createBooks(){
+
+    const shelves=[
+        document.getElementById("shelf1"),
+        document.getElementById("shelf2"),
+        document.getElementById("shelf3"),
+        document.getElementById("shelf4")
+    ];
+
+    stories.forEach(function(story,index){
+
+        let shelfIndex;
+
+        if(index<10){
+            shelfIndex=0;
+        }
+        else if(index<20){
+            shelfIndex=1;
+        }
+        else if(index<30){
+            shelfIndex=2;
+        }
+        else{
+            shelfIndex=3;
+        }
+
+        const book=document.createElement("div");
+
+        book.className="book "+story.color;
+
+        book.dataset.title=
+            story.title.toLowerCase();
+
+        book.innerHTML=`
+            <div class="book-title">
+                ${story.title}
+            </div>
+
+            <div class="book-number">
+                ${String(story.id).padStart(2,"0")}
+            </div>
+        `;
+
+        book.addEventListener("click",function(e){
+
+            e.stopPropagation();
+
+            if(book.classList.contains("lifting")){
+                return;
+            }
+
+            const shelf=book.closest(".shelf-row");
+            const row=book.closest(".books-row");
+
+            if(shelf){shelf.classList.add("book-opening");}
+            if(row){row.classList.add("book-lift-active");}
+            book.classList.add("lifting");
+
+            setTimeout(function(){
+                book.classList.remove("lifting");
+                if(shelf){shelf.classList.remove("book-opening");}
+                if(row){row.classList.remove("book-lift-active");}
+                openStory(story.id);
+            },650);
+
+        });
+
+        shelves[shelfIndex].appendChild(book);
+
+    });
+}
+
+
+/* =========================================================
+   SHELVES
+========================================================= */
+
+function setupShelves(){
+
+    document
+    .querySelectorAll(".shelf-row")
+    .forEach(function(shelf){
+
+        shelf.addEventListener("click",function(){
+
+            if(shelf.classList.contains("zoomed")){
+                return;
+            }
+
+            document
+            .getElementById("libraryRoom")
+            .classList.add("zoom-active");
+
+            shelf.classList.add("zoomed");
+
+            document
+            .getElementById("zoomOverlay")
+            .classList.add("active");
+
+            document
+            .getElementById("backButton")
+            .classList.add("show");
+
+            document.body.classList.add("zooming");
+
+        });
+
+    });
+
+}
+
+function closeShelf(){
+
+    const shelf=
+        document.querySelector(".shelf-row.zoomed");
+
+    if(!shelf){
+        return;
+    }
+
+    shelf.classList.remove("zoomed");
+
+    document
+    .getElementById("libraryRoom")
+    .classList.remove("zoom-active");
+
+    document
+    .getElementById("zoomOverlay")
+    .classList.remove("active");
+
+    document
+    .getElementById("backButton")
+    .classList.remove("show");
+
+    document.body.classList.remove("zooming");
+    readerMusicMini.classList.remove("show");
+}
+
+document
+.getElementById("backButton")
+.addEventListener("click",closeShelf);
+
+document
+.getElementById("zoomOverlay")
+.addEventListener("click",closeShelf);
+
+
+/* =========================================================
+   STORY
+========================================================= */
+
+let currentStory=null;
+
+function makeScriptCap(text){
+    const match=String(text||"").match(/^(\s*)([A-Za-zÀ-ÖØ-öø-ÿ])(.*)$/);
+    if(!match) return null;
+    const cap=match[2].toUpperCase();
+    return match[1]+'<span class=\"drop-cap\">'+cap+'</span>'+escapeHTML(match[3]);
+}
+
+function openStory(id){
+
+    const story=
+        stories.find(function(item){
+            return item.id===id;
+        });
+
+    if(!story){
+        return;
+    }
+
+    currentStory=story;
+
+    document
+    .getElementById("storyCategory")
+    .textContent=story.category;
+
+    document
+    .getElementById("storyTitle")
+    .textContent=story.title;
+
+    document
+    .getElementById("storyOrigin")
+    .textContent=story.origin;
+
+    let html="";
+    let firstStoryParagraph=true;
+
+    story.text.forEach(function(paragraph){
+
+        if(paragraph.startsWith("|")){
+
+            const dialogueText=paragraph.slice(1).trim();
+
+            html+=`
+                <p class="dialogue">
+                    ${dialogueText}
+                </p>
+            `;
+
+        }
+        else if(paragraph.startsWith("Pesan Moral:")){
+
+            html+=`
+                <div class="moral">
+
+                    <span class="moral-title">
+                        ✦ PESAN MORAL ✦
+                    </span>
+
+                    ${paragraph
+                    .replace("Pesan Moral:","")
+                    .trim()}
+
+                </div>
+            `;
+
+        }
+        else{
+
+            if(firstStoryParagraph){
+                const opening=makeScriptCap(paragraph);
+
+                if(opening){
+                    html+=`<p class="story-opening">${opening}</p>`;
+                }else{
+                    html+=`<p class="story-opening">${escapeHTML(paragraph)}</p>`;
+                }
+
+                firstStoryParagraph=false;
+            }else{
+                html+=`
+                    <p>${paragraph}</p>
+                `;
+            }
+
+        }
+
+    });
+
+    document
+    .getElementById("storyText")
+    .innerHTML=html;
+
+    updateBookmark();
+
+    document
+    .getElementById("reader")
+    .classList.add("show");
+
+    readerMusicMini.classList.toggle("show",isPlaying);
+    if(isPlaying){
+        miniTrackTitle.textContent=musicTracks[currentTrack].title;
+        miniMusicToggle.textContent="Ⅱ";
+    }
+
+    document.body.classList.add("zooming");
+}
+
+
+function closeReader(){
+
+    document
+    .getElementById("reader")
+    .classList.remove("show");
+
+    document.body.classList.remove("zooming");
+}
+
+document
+.getElementById("closeReader")
+.addEventListener("click",closeReader);
+
+
+/* =========================================================
+   BOOKMARK
+========================================================= */
+
+function getBookmarks(){
+
+    try{
+
+        return JSON.parse(
+            localStorage.getItem(
+                "cozyLibraryBookmarks"
+            )||"[]"
+        );
+
+    }catch(e){
+
+        return [];
+
+    }
+}
+
+function updateBookmark(){
+
+    if(!currentStory){
+        return;
+    }
+
+    const button=
+        document.getElementById("bookmarkBtn");
+
+    const saved=
+        getBookmarks().includes(
+            currentStory.id
+        );
+
+    if(saved){
+
+        button.textContent=
+            "♧ Saved to your shelf";
+
+        button.classList.add("saved");
+
+    }else{
+
+        button.textContent=
+            "♧ Save this story";
+
+        button.classList.remove("saved");
+
+    }
+}
+
+document
+.getElementById("bookmarkBtn")
+.addEventListener("click",function(){
+
+    if(!currentStory){
+        return;
+    }
+
+    let bookmarks=getBookmarks();
+
+    if(bookmarks.includes(currentStory.id)){
+
+        bookmarks=
+            bookmarks.filter(function(id){
+                return id!==currentStory.id;
+            });
+
+    }else{
+
+        bookmarks.push(currentStory.id);
+
+    }
+
+    localStorage.setItem(
+        "cozyLibraryBookmarks",
+        JSON.stringify(bookmarks)
+    );
+
+    updateBookmark();
+
+    if(document.getElementById("favoritesPage").classList.contains("show")){
+        renderFavorites();
+    }
+
+});
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+document
+.getElementById("search")
+.addEventListener("input",function(){
+
+    const query=
+        this.value.toLowerCase().trim();
+
+    const books=
+        document.querySelectorAll(".book");
+
+    let found=0;
+
+    books.forEach(function(book){
+
+        const match=
+            book.dataset.title.includes(query);
+
+        book.style.display=
+            match ? "block" : "none";
+
+        if(match){
+            found++;
+        }
+
+    });
+
+    document
+    .getElementById("empty")
+    .style.display=
+        found===0 ? "block" : "none";
+
+});
+
+
+/* =========================================================
+   NIGHT MODE
+========================================================= */
+
+document
+.getElementById("nightButton")
+.addEventListener("click",function(){
+
+    const library=
+        document.querySelector(".library");
+
+    if(library.dataset.night!=="yes"){
+
+        library.dataset.night="yes";
+
+        library.style.background=
+        `
+        radial-gradient(
+            circle at 50% 15%,
+            #342116,
+            #090503 75%
+        )
+        `;
+
+    }else{
+
+        library.dataset.night="no";
+
+        library.style.background=
+        `
+        linear-gradient(
+            rgba(39,23,15,.3),
+            rgba(22,12,8,.88)
+        ),
+        radial-gradient(
+            circle at 50% 10%,
+            #68452d,
+            #24160e 72%
+        )
+        `;
+
+    }
+
+});
+
+
+/* =========================================================
+   MUSIC ROOM
+========================================================= */
+
+const musicTracks=[
+    {title:"Magnolia",artist:"Magnolia Celebration",file:"magnolia.m4a"},
+    {title:"Earrings",artist:"Malcolm Todd",file:"earrings.m4a"},
+    {title:"Past Life",artist:"Ariana Grande",file:"past life.m4a"},
+    {title:"White Keys",artist:"Dominic Fike",file:"white keys.m4a"},
+    {title:"About You",artist:"The 1975",file:"about you.m4a"},
+    {title:"Merry Christmas, Please Don't Call",artist:"Bleachers",file:"merry christmas.m4a"},
+    {title:"Seasons",artist:"wave to earth",file:"seasons.m4a"},
+    {title:"Hopeless Romantic",artist:"Meghan Trainor",file:"hopeless romantic.m4a"},
+    {title:"Hey There Delilah",artist:"Plain White T's",file:"hey there delilah.m4a"},
+    {title:"Good Luck, Babe!",artist:"Chappell Roan",file:"good luck babe.m4a"}
+];
+
+let currentTrack=0;
+let isPlaying=false;
+
+const audio=document.getElementById("musicAudio");
+const musicRoom=document.getElementById("musicRoom");
+const favoritesPage=document.getElementById("favoritesPage");
+const record=document.getElementById("record");
+const trackNumber=document.getElementById("trackNumber");
+const trackTitle=document.getElementById("trackTitle");
+const trackArtist=document.getElementById("trackArtist");
+const musicPlay=document.getElementById("musicPlay");
+const lyricsText=document.getElementById("lyricsText");
+const lyricsWindow=document.getElementById("lyricsWindow");
+const musicButton=document.getElementById("musicButton");
+const readerMusicMini=document.getElementById("readerMusicMini");
+const miniTrackTitle=document.getElementById("miniTrackTitle");
+const miniMusicToggle=document.getElementById("miniMusicToggle");
+
+let syncedLyrics=[];
+let lyricFetchToken=0;
+let lyricsReady=Promise.resolve();
+const lyricCacheKey="cozyLibrarySyncedLyricsV2";
+
+function getLyricCache(){
+    try{return JSON.parse(localStorage.getItem(lyricCacheKey)||"{}");}catch(e){return {};}
+}
+function saveLyricCache(cache){
+    try{localStorage.setItem(lyricCacheKey,JSON.stringify(cache));}catch(e){}
+}
+
+function parseLRC(lrc){
+    const result=[];
+    String(lrc||"").split(/\r?\n/).forEach(function(raw){
+        const matches=[...raw.matchAll(/\[(\d{1,2}):(\d{2})(?:[.:](\d{1,3}))?\]/g)];
+        const text=raw.replace(/\[[^\]]+\]/g,"").trim();
+        if(!text || !matches.length){return;}
+        matches.forEach(function(m){
+            const minutes=Number(m[1]);
+            const seconds=Number(m[2]);
+            const fraction=m[3] ? Number(m[3]) / Math.pow(10,String(m[3]).length) : 0;
+            result.push({time:minutes*60+seconds+fraction,text:text});
+        });
+    });
+    return result.sort(function(a,b){return a.time-b.time;});
+}
+
+function renderLyrics(lines){
+    syncedLyrics=lines||[];
+    if(!syncedLyrics.length){
+        lyricsText.innerHTML='<div class="lyric-line active">Lyrics unavailable for this track</div>';
+        lyricsText.style.transform="translateY(0px)";
+        return;
+    }
+    lyricsText.innerHTML=syncedLyrics.map(function(line,index){
+        return '<div class="lyric-line" data-lyric-index="'+index+'">'+escapeHTML(line.text)+'</div>';
+    }).join("");
+    updateLyrics(true);
+}
+
+function escapeHTML(value){
+    return String(value).replace(/[&<>'"]/g,function(ch){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch];
+    });
+}
+
+async function fetchLyrics(track){
+    const token=++lyricFetchToken;
+    const cache=getLyricCache();
+    const cacheId=track.artist.toLowerCase()+"::"+track.title.toLowerCase();
+    if(Array.isArray(cache[cacheId]) && cache[cacheId].length){
+        renderLyrics(cache[cacheId]);
+        return true;
+    }
+    renderLyrics([{time:0,text:"Loading synchronized lyrics…"}]);
+    try{
+        const params=new URLSearchParams({artist_name:track.artist,track_name:track.title});
+        const response=await fetch('https://lrclib.net/api/get?'+params.toString(),{headers:{Accept:'application/json'}});
+        if(!response.ok) throw new Error('Lyrics request failed');
+        const data=await response.json();
+        if(token!==lyricFetchToken) return false;
+        const synced=parseLRC(data.syncedLyrics);
+        if(synced.length){
+            cache[cacheId]=synced;
+            saveLyricCache(cache);
+            renderLyrics(synced);
+            updateLyrics(true);
+            return true;
+        }
+        const plain=String(data.plainLyrics||'').split(/\r?\n/).map(function(x){return x.trim();}).filter(Boolean);
+        if(plain.length){
+            const duration=Number(audio.duration)||180;
+            const timed=plain.map(function(text,index){return {time:index*(duration/Math.max(plain.length,1)),text:text};});
+            renderLyrics(timed);
+            return true;
+        }
+        renderLyrics([{time:0,text:"Synchronized lyrics not available"}]);
+        return false;
+    }catch(error){
+        if(token!==lyricFetchToken) return false;
+        renderLyrics([{time:0,text:"Lyrics could not be loaded"}]);
+        return false;
+    }
+}
+
+function updateLyrics(force){
+    const lines=lyricsText.querySelectorAll('.lyric-line');
+    if(!lines.length) return;
+    let activeIndex=0;
+    for(let i=0;i<syncedLyrics.length;i++){
+        if(audio.currentTime>=syncedLyrics[i].time) activeIndex=i;
+        else break;
+    }
+    lines.forEach(function(line,index){
+        line.classList.toggle('active',index===activeIndex);
+        line.classList.toggle('passed',index<activeIndex);
+    });
+    const active=lyricsText.querySelector('.lyric-line.active');
+    if(active){
+        const target=active.offsetTop-(lyricsWindow.clientHeight/2)+(active.offsetHeight/2);
+        lyricsText.style.transform='translateY('+(-Math.max(0,target))+'px)';
+    }
+}
+
+function loadTrack(index){
+    currentTrack=(index+musicTracks.length)%musicTracks.length;
+    const track=musicTracks[currentTrack];
+    audio.src=track.file;
+    trackNumber.textContent=String(currentTrack+1).padStart(2,'0');
+    trackTitle.textContent=track.title;
+    trackArtist.textContent=track.artist;
+    miniTrackTitle.textContent=track.title+' · '+track.artist;
+    lyricsReady=fetchLyrics(track);
+}
+
+async function playMusic(){
+    try{ await lyricsReady; }catch(e){}
+    audio.play().then(function(){
+        isPlaying=true;
+        record.classList.add("playing");
+        musicPlay.textContent="Ⅱ";
+        miniMusicToggle.textContent="Ⅱ";
+        musicButton.classList.add("is-playing");
+        readerMusicMini.classList.toggle("show",document.getElementById("reader").classList.contains("show"));
+    }).catch(function(){
+        isPlaying=false;
+        record.classList.remove("playing");
+        musicPlay.textContent="▶";
+        miniMusicToggle.textContent="▶";
+        musicButton.classList.remove("is-playing");
+    });
+}
+
+function pauseMusic(){
+    audio.pause();
+    isPlaying=false;
+    record.classList.remove("playing");
+    musicPlay.textContent="▶";
+    miniMusicToggle.textContent="▶";
+    musicButton.classList.remove("is-playing");
+}
+
+function openMusicRoom(){
+    closeFavoritesPage();
+    musicRoom.classList.add("show");
+    musicRoom.setAttribute("aria-hidden","false");
+    loadTrack(Math.floor(Math.random()*musicTracks.length));
+    playMusic();
+}
+
+function closeMusicRoom(){
+    /* Music deliberately keeps playing after the room closes. */
+    musicRoom.classList.remove("show");
+    musicRoom.setAttribute("aria-hidden","true");
+}
+
+document.getElementById("musicButton").addEventListener("click",openMusicRoom);
+document.getElementById("musicClose").addEventListener("click",closeMusicRoom);
+document.getElementById("musicPlay").addEventListener("click",function(){
+    isPlaying ? pauseMusic() : playMusic();
+});
+document.getElementById("musicPrev").addEventListener("click",function(){
+    loadTrack(currentTrack-1);
+    playMusic();
+});
+document.getElementById("musicNext").addEventListener("click",function(){
+    loadTrack(currentTrack+1);
+    playMusic();
+});
+audio.addEventListener("timeupdate",function(){
+    updateLyrics(false);
+});
+
+audio.addEventListener("loadedmetadata",function(){
+    updateLyrics(true);
+});
+
+audio.addEventListener("ended",function(){
+    loadTrack(currentTrack+1);
+    playMusic();
+});
+
+miniMusicToggle.addEventListener("click",function(){
+    isPlaying ? pauseMusic() : playMusic();
+});
+
+/* =========================================================
+   FAVORITES PAGE
+========================================================= */
+
+function renderFavorites(){
+    const bookmarks=getBookmarks();
+    const grid=document.getElementById("favoritesGrid");
+    const empty=document.getElementById("emptyFavorites");
+
+    grid.innerHTML="";
+
+    const saved=stories.filter(function(story){
+        return bookmarks.includes(story.id);
+    });
+
+    empty.style.display=saved.length ? "none" : "block";
+
+    saved.forEach(function(story){
+        const card=document.createElement("article");
+        card.className="favorite-card";
+        card.innerHTML=`
+            <div class="favorite-spine"><span>${story.title}</span></div>
+            <div class="favorite-info">
+                <small>${story.category}</small>
+                <h3>${story.title}</h3>
+                <p>${story.origin}</p>
+                <div class="favorite-actions">
+                    <button class="open-favorite" data-id="${story.id}" type="button">READ</button>
+                    <button class="remove-favorite" data-id="${story.id}" type="button">REMOVE</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    grid.querySelectorAll(".open-favorite").forEach(function(button){
+        button.addEventListener("click",function(){
+            closeFavoritesPage();
+            openStory(Number(this.dataset.id));
+        });
+    });
+
+    grid.querySelectorAll(".remove-favorite").forEach(function(button){
+        button.addEventListener("click",function(){
+            let bookmarks=getBookmarks();
+            const id=Number(this.dataset.id);
+            bookmarks=bookmarks.filter(function(item){return item!==id;});
+            localStorage.setItem("cozyLibraryBookmarks",JSON.stringify(bookmarks));
+            renderFavorites();
+            updateBookmark();
+        });
+    });
+}
+
+function openFavoritesPage(){
+    closeMusicRoom();
+    renderFavorites();
+    favoritesPage.classList.add("show");
+    favoritesPage.setAttribute("aria-hidden","false");
+}
+
+function closeFavoritesPage(){
+    favoritesPage.classList.remove("show");
+    favoritesPage.setAttribute("aria-hidden","true");
+}
+
+document.getElementById("bookmarkListButton").addEventListener("click",openFavoritesPage);
+document.getElementById("favoritesClose").addEventListener("click",closeFavoritesPage);
+
+/* =========================================================
+   ESC
+========================================================= */
+
+document.addEventListener("keydown",function(e){
+
+    if(e.key!=="Escape"){
+        return;
+    }
+
+    const reader=document.getElementById("reader");
+
+    if(reader.classList.contains("show")){
+        closeReader();
+    }else if(musicRoom.classList.contains("show")){
+        closeMusicRoom();
+    }else if(favoritesPage.classList.contains("show")){
+        closeFavoritesPage();
+    }else{
+        closeShelf();
+    }
+
+});
+
+
+/* START */
+
+loadTrack(0);
+createBooks();
+setupShelves();
+
+</script>
+
+</body>
+</html>
